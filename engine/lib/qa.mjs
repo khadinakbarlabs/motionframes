@@ -72,7 +72,10 @@ export function qaVideo(dir, mp4) {
 // Two-pass loudness normalisation of a rendered mp4 to -14 LUFS / -1 dBTP (video stream copied).
 export function normalize(mp4, out) {
   const r = spawnSync("ffmpeg", ["-hide_banner", "-i", mp4, "-af", `loudnorm=I=${TARGET.lufs}:TP=-1.5:LRA=11:print_format=json`, "-f", "null", "-"], { encoding: "utf8" });
-  const j = JSON.parse((r.stderr || "").slice((r.stderr || "").lastIndexOf("{")));
+  // ffmpeg 8 prints more lines after the loudnorm block, so cut out just the last {...}
+  const err = r.stderr || "", open = err.lastIndexOf("{"), close = err.indexOf("}", open);
+  if (open < 0 || close < 0) throw new Error("loudnorm: ffmpeg printed no measurement (is there an audio track?)");
+  const j = JSON.parse(err.slice(open, close + 1));
   const ln = `loudnorm=I=${TARGET.lufs}:TP=-1.5:LRA=11:measured_I=${j.input_i}:measured_TP=${j.input_tp}:measured_LRA=${j.input_lra}:measured_thresh=${j.input_thresh}:offset=${j.target_offset}:linear=true`;
   execFileSync("ffmpeg", ["-v", "error", "-y", "-i", mp4, "-c:v", "copy", "-af", ln, "-ar", "48000", "-c:a", "aac", "-b:a", "192k", out]);
   return out;
