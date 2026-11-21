@@ -1,0 +1,10 @@
+{
+  "name": "toonshorts",
+  "version": "0.1.0",
+  "description": "Animated vertical shorts from one spec file, rendered by HyperFrames.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "bin": { "toonshorts": "engine/toonshorts.mjs" },
+  "engines": { "node": ">=20" },
+  "repository": "github:khadinakbarlabs/toonshorts"
+}

@@ -1,0 +1,13 @@
+<!-- s4: nowhere to go -> it pushes -> rails buckle -->
+<rect width="1080" height="1920" fill="#ffd27a" />
+<rect y="1300" width="1080" height="620" fill="#c79a74" />
+<path id="s4-rail" d="M0 1200 L1080 1200" stroke="#0f1220" stroke-width="26" fill="none" />
+<path d="M0 1260 L1080 1260" stroke="#0f1220" stroke-width="26" fill="none" />
+<rect x="0" y="1100" width="60" height="220" fill="#6c4fb5" stroke="#0f1220" stroke-width="8" />
+<rect x="1020" y="1100" width="60" height="220" fill="#6c4fb5" stroke="#0f1220" stroke-width="8" />
+<script>
+  fx.boil("#s4-rail", at("L3:pushes") - 0.4, at("L3:buckle"), { px: 2.5 });
+  tl.to("#s4-rail", { attr: { d: "M0 1200 Q540 900 1080 1200" }, duration: 0.45, ease: "back.out(2)" }, at("L3:buckle"));
+  fx.kick("#s4", at("L3:buckle"), 18);
+  fx.cam("#s4-cam", { scale: 1.2 }, at("L3:pushes"), 1.2, "540 1200");
+</script>

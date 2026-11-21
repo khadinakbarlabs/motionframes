@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+.hyperframes/
+.media/
+renders/
+snaps/
+examples/*/assets/
+examples/*/index.html
+examples/*/sfx.lock.json
+examples/*/SOUND-CREDITS.md
+examples/*/qa-report.md

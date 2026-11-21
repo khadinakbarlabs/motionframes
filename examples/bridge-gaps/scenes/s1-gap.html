@@ -1,0 +1,13 @@
+<!-- s1 hook: a bridge with a visible gap, camera pushes into it -->
+<rect width="1080" height="1920" fill="#ff9a5c" />
+<circle cx="820" cy="520" r="120" fill="#ffe08a" />
+<rect y="1350" width="1080" height="570" fill="#2a8fa0" />
+<rect x="0" y="1080" width="520" height="70" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
+<rect x="560" y="1080" width="520" height="70" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
+<rect x="160" y="1150" width="90" height="240" fill="#c79a74" stroke="#0f1220" stroke-width="8" />
+<rect x="830" y="1150" width="90" height="240" fill="#c79a74" stroke="#0f1220" stroke-width="8" />
+<path id="s1-arrow" d="M540 860 v130 m-40 -40 l40 40 l40 -40" stroke="#0f1220" stroke-width="14" fill="none" stroke-linecap="round" opacity="0" />
+<script>
+  fx.cam("#s1-cam", { scale: 1.35 }, 0.2, at("L1.end") - 0.4, "540 1110");
+  fx.pop("#s1-arrow", at("L1:gaps"));
+</script>

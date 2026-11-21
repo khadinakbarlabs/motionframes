@@ -1,0 +1,12 @@
+<!-- s6: Pip's filled bridge grew a bump -->
+<rect width="1080" height="1920" fill="#ff9a5c" />
+<rect y="1350" width="1080" height="570" fill="#2a8fa0" />
+<path id="s6-deck" d="M-40 1080 L1120 1080 L1120 1150 L-40 1150 Z" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
+<rig type="bean" id="pip6" x="540" y="1080" scale="0.9" shirt="#2ec4b6" />
+<script>
+  tl.to("#s6-deck", { attr: { d: "M-40 1080 Q540 820 1120 1080 L1120 1150 Q540 890 -40 1150 Z" }, duration: 1.0, ease: "power2.inOut" }, at("L5:July"));
+  tl.to("#pip6", { y: -195, duration: 1.0, ease: "power2.inOut" }, at("L5:July"));
+  fx.squash("#pip6", at("L5:bump"), { amt: 0.14 });
+  fx.talk("pip6", "L5");
+  fx.blinks("#pip6-eyes", S.start, S.end, 9);
+</script>

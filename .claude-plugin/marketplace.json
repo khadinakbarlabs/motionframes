@@ -1,0 +1,14 @@
+{
+  "name": "toonshorts",
+  "owner": { "name": "Khadin Akbar", "url": "https://github.com/khadinakbarlabs" },
+  "description": "Animated vertical shorts from one spec file, rendered by HyperFrames.",
+  "plugins": [
+    {
+      "name": "toonshorts",
+      "source": "./",
+      "description": "Story beats, rigs, acting, captions and sound design for animated shorts, timed to the voice automatically.",
+      "homepage": "https://github.com/khadinakbarlabs/toonshorts",
+      "license": "Apache-2.0"
+    }
+  ]
+}

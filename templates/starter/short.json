@@ -1,0 +1,18 @@
+{
+  "title": "My short",
+  "voice": "am_michael",
+  "palette": { "ink": "#0f1220", "paper": "#f3eadb", "bg": "#0f1220", "hot": "#ffc93c" },
+  "lines": [
+    { "id": "L1", "text": "What if your phone could hear you blink?" },
+    { "id": "L2", "text": "It can't. But the reason why is stranger than you think." }
+  ],
+  "scenes": [
+    { "id": "s1", "at": "0", "file": "s1.html" },
+    { "id": "s2", "at": "L2:But-0.1", "file": "s2.html" }
+  ],
+  "captions": { "words": 2, "hot": ["blink", "stranger"] },
+  "cues": [
+    { "at": "L1:blink", "sfx": "cartoon boing", "vol": 0.45 }
+  ],
+  "sound": { "cutWhoosh": true, "captionPops": "hot" }
+}

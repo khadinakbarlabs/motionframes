@@ -1,0 +1,20 @@
+<!-- s2: Pip walks in, finds the gap, a phone falls in, he fills it -->
+<rect width="1080" height="1920" fill="#ffb066" />
+<rect y="1350" width="1080" height="570" fill="#2a8fa0" />
+<rect x="0" y="1080" width="600" height="70" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
+<rect x="650" y="1080" width="430" height="70" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
+<rect id="s2-fill" x="600" y="1080" width="50" height="70" fill="#6b5b4a" stroke="#0f1220" stroke-width="6" opacity="0" />
+<rect id="s2-phone" x="602" y="960" width="46" height="80" rx="8" fill="#0f1220" opacity="0" />
+<rig type="bean" id="pip" x="0" y="1080" scale="0.9" shirt="#2ec4b6" />
+<script>
+  const walkEnd = at("L2:found");
+  fx.walk("pip", S.start + 0.2, walkEnd, -160, 470);
+  fx.talk("pip", "L2");
+  fx.blinks("#pip-eyes", walkEnd, S.end, 5);
+  fx.look("pip", 1, at("L2:gap"));
+  tl.set("#s2-phone", { opacity: 1 }, at("L2:swallow") - 0.3);
+  tl.to("#s2-phone", { y: 380, rotation: 40, svgOrigin: "625 1000", duration: 0.5, ease: "power2.in" }, at("L2:swallow") - 0.3);
+  fx.squash("#pip", at("L2:filled") - 0.1);
+  fx.pop("#s2-fill", at("L2:filled"), { from: 0.2, origin: "50% 100%" });
+  fx.cam("#s2-cam", { scale: 1.25 }, at("L2:filled") - 0.3, 0.6, "620 1100");
+</script>

@@ -1,0 +1,35 @@
+<!-- toonshorts rig: "bean" — 2.5D ink-cartoon character (rounded torso, skin head, optional hard hat),
+     feet on y=0, facing +x, ~440 px tall at scale 1. The "Pip" look from the bridge-gaps example.
+     Use in a scene:  <rig type="bean" id="pip" x="480" y="1100" shirt="#2ec4b6" hat="#ffc93c" prop="clipboard" />
+     hat="none" removes the hat; prop="none" removes the clipboard.
+     Parts: {{id}}, {{id}}-body, {{id}}-head, {{id}}-eyes, {{id}}-mouth, {{id}}-mouthO, {{id}}-armL (back), {{id}}-armR (front),
+     {{id}}-legL, {{id}}-legR, {{id}}-hat, {{id}}-prop -->
+<g transform="translate({{x}} {{y}}) scale({{scale}})">
+  <g id="{{id}}" stroke="{{ink}}" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="0" cy="0" rx="70" ry="12" fill="{{ink}}" opacity="0.25" stroke="none" />
+    <g id="{{id}}-body">
+      <g id="{{id}}-legL"><line x1="-16" y1="-140" x2="-20" y2="-8" stroke-width="12" stroke="{{limb}}" /><ellipse cx="-26" cy="-6" rx="20" ry="9" fill="{{ink}}" stroke-width="2" /></g>
+      <g id="{{id}}-legR"><line x1="16" y1="-140" x2="20" y2="-8" stroke-width="12" stroke="{{limb}}" /><ellipse cx="26" cy="-6" rx="20" ry="9" fill="{{ink}}" stroke-width="2" /></g>
+      <g id="{{id}}-armL"><line x1="-38" y1="-275" x2="-66" y2="-175" stroke-width="11" stroke="{{limb}}" /></g>
+      <rect x="-46" y="-300" width="92" height="168" rx="34" fill="{{shirt}}" stroke-width="5" />
+      <path d="M-46 -230 h92" stroke-width="4" fill="none" />
+      <g id="{{id}}-armR">
+        <line x1="38" y1="-275" x2="70" y2="-180" stroke-width="11" stroke="{{limb}}" />
+        <g id="{{id}}-prop" data-prop="{{prop}}">
+          <rect x="62" y="-206" width="44" height="56" rx="6" fill="#f3eadb" stroke-width="4" />
+          <path d="M71 -190 h26 M71 -177 h20" stroke-width="3" fill="none" />
+        </g>
+      </g>
+      <g id="{{id}}-head">
+        <circle cx="0" cy="-362" r="60" fill="{{skin}}" stroke-width="5" />
+        <g id="{{id}}-hat" data-hat="{{hat}}">
+          <path d="M-64 -372 Q-60 -440 0 -442 Q60 -440 64 -372 Z" fill="{{hat}}" stroke-width="5" />
+          <path d="M-80 -372 H80" stroke-width="7" fill="none" />
+        </g>
+        <g id="{{id}}-eyes" fill="{{ink}}" stroke="none"><circle cx="-18" cy="-350" r="7" /><circle cx="22" cy="-350" r="7" /></g>
+        <path id="{{id}}-mouth" d="M-6 -318 q8 6 16 0" stroke-width="4" fill="none" />
+        <ellipse id="{{id}}-mouthO" cx="2" cy="-316" rx="8" ry="7" fill="{{ink}}" stroke="none" opacity="0" />
+      </g>
+    </g>
+  </g>
+</g>

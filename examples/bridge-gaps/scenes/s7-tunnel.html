@@ -1,0 +1,12 @@
+<!-- s7: Pip in a tunnel, paperwork grows -->
+<rect width="1080" height="1920" fill="#1c1410" />
+<path d="M140 1500 V900 Q540 520 940 900 V1500 Z" fill="#5a3a2a" stroke="#0f1220" stroke-width="10" />
+<rect id="s7-papers" x="660" y="1380" width="120" height="40" fill="#f3eadb" stroke="#0f1220" stroke-width="6" />
+<rig type="bean" id="pip7" x="420" y="1500" scale="0.9" shirt="#2ec4b6" hat="#ffc93c" prop="none" />
+<script>
+  fx.talk("pip7", "L5");
+  fx.breathe("#pip7-body", S.start, S.end);
+  fx.grow("#s7-papers", at("L5:paperwork"), 0.9, { from: 1, to: 6 });
+  fx.look("pip7", 1, at("L5:paperwork") + 0.2);
+  fx.cam("#s7-cam", { scale: 1.1 }, S.start, 2.5, "540 1300");
+</script>

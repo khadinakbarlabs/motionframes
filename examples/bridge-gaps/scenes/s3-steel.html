@@ -1,0 +1,15 @@
+<!-- s3: steel grows when hot: a bar stretches against a ruler, sun heats it -->
+<rect width="1080" height="1920" fill="#fff1d6" />
+<circle id="s3-sun" cx="540" cy="520" r="130" fill="#ffc93c" stroke="#0f1220" stroke-width="8" />
+<g id="s3-ruler"><rect x="140" y="1180" width="800" height="60" fill="#f3eadb" stroke="#0f1220" stroke-width="6" />
+  <path d="M180 1180 v30 M260 1180 v20 M340 1180 v30 M420 1180 v20 M500 1180 v30 M580 1180 v20 M660 1180 v30 M740 1180 v20 M820 1180 v30 M900 1180 v20" stroke="#0f1220" stroke-width="5" /></g>
+<rect id="s3-bar" x="180" y="1040" width="600" height="110" rx="10" fill="#9fb3d6" stroke="#0f1220" stroke-width="8" />
+<text id="s3-mm" x="540" y="1420" text-anchor="middle" font-family="Archivo Black" font-size="90" fill="#0f1220" opacity="0">+5 CM</text>
+<script>
+  fx.pop("#s3-sun", S.start + 0.1);
+  tl.to("#s3-bar", { fill: "#ff7a52", duration: 1.2, ease: "power1.inOut" }, at("L3:hot") - 0.2);
+  fx.grow("#s3-bar", at("L3:grows"), 0.8, { axis: "X", origin: "0% 50%", from: 1, to: 1.06 });
+  fx.grow("#s3-bar", at("L3:5"), 1.0, { axis: "X", origin: "0% 50%", from: 1.06, to: 1.25 });
+  fx.pop("#s3-mm", at("L3:5"));
+  fx.cam("#s3-cam", { scale: 1.12 }, at("L3:tiny"), 0.8, "780 1100");
+</script>

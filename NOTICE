@@ -1,0 +1,9 @@
+toonshorts
+Copyright 2026 Khadin Akbar
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product renders video with HyperFrames (https://github.com/heygen-com/hyperframes),
+Copyright HeyGen, Apache License 2.0. HyperFrames is called through its CLI and is not bundled.
+
+Ideas and rules adapted from MIT-licensed projects are listed in THIRD_PARTY_NOTICES.md.

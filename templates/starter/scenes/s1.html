@@ -1,0 +1,11 @@
+<!-- s1: hook. Frame 0 is already the hook picture. -->
+<rect width="1080" height="1920" fill="#ffb066" />
+<rect y="1500" width="1080" height="420" fill="#e0956a" />
+<rig type="__RIG__" id="hero" x="540" y="1520" scale="1.6" shirt="#2ec4b6" />
+<script>
+  fx.breathe("#hero-body", S.start, S.end);
+  fx.blinks("#hero-eyes", S.start, S.end, 11);
+  fx.talk("hero", "L1");
+  fx.squash("#hero", at("L1:blink"));
+  fx.cam("#s1-cam", { scale: 1.15 }, at("L1:blink") - 0.2, 0.5, "540 1100");
+</script>
