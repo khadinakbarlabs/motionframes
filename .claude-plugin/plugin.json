@@ -1,7 +1,7 @@
 {
   "name": "toonshorts",
   "description": "Animated vertical shorts from one spec file. Claude writes the story and the scene art; toonshorts times every scene, caption, mouth flap and sound effect to the voice, then renders with HyperFrames. Free path: local Kokoro voice, local whisper timing, CC0/CC BY sounds with auto credits.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": { "name": "Khadin Akbar", "url": "https://github.com/khadinakbarlabs" },
   "homepage": "https://github.com/khadinakbarlabs/toonshorts",
   "repository": "https://github.com/khadinakbarlabs/toonshorts",

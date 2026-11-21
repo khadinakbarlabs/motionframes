@@ -1,0 +1,36 @@
+<!-- s6: same bridge, gap filled. A July calendar drops in, the heat makes the deck bulge into a bump under Pip -->
+<defs>
+  <linearGradient id="s8-skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a3a" /><stop offset="0.7" stop-color="#ffa860" /><stop offset="1" stop-color="#ffc884" /></linearGradient>
+  <linearGradient id="s8-waterg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f9db0" /><stop offset="1" stop-color="#17596a" /></linearGradient>
+</defs>
+<backdrop preset="sunset" horizon="1300" ground="water" sun="840 700" seed="9" sky="#ff5a32,#ff9450,#ffc477" />
+<g id="s8-cal" opacity="0">
+  <rect x="120" y="620" width="230" height="250" rx="16" fill="#ffffff" stroke="#0f1220" stroke-width="8" />
+  <rect x="120" y="620" width="230" height="74" rx="16" fill="#ff5a4a" stroke="#0f1220" stroke-width="8" />
+  <text x="235" y="676" text-anchor="middle" font-family="Archivo Black" font-size="46" fill="#ffffff">JULY</text>
+  <text x="235" y="820" text-anchor="middle" font-family="Archivo Black" font-size="110" fill="#0f1220">35°</text>
+</g>
+<g stroke="#0f1220" stroke-width="8" stroke-linejoin="round">
+  <rect x="120" y="1200" width="120" height="260" fill="#c79a74" />
+  <rect x="840" y="1200" width="120" height="260" fill="#c79a74" />
+</g>
+<path id="s8-rail" d="M-40 1060 Q540 1060 1120 1060" stroke="#0f1220" stroke-width="10" fill="none" />
+<path id="s8-deck" d="M-40 1120 Q540 1120 1120 1120 L1120 1204 Q540 1204 -40 1204 Z" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" stroke-linejoin="round" />
+<rect id="s8-patch" x="505" y="1120" width="70" height="84" fill="#7a6552" stroke="#0f1220" stroke-width="6" />
+<g id="s8-lines" opacity="0.9"><path d="M20 1162 h60 M140 1162 h60 M260 1162 h60 M380 1162 h60 M620 1162 h60 M740 1162 h60 M860 1162 h60 M980 1162 h60" stroke="#ffffff" stroke-width="8" stroke-linecap="round" /></g>
+<rig type="bean" id="pip8" x="540" y="1122" scale="1" shirt="#2ec4b6" face="worried" />
+<script>
+  const july = at("L5:July");
+    tl.fromTo("#s8-cal", { opacity: 0, y: -120, rotation: -12, svgOrigin: "235 745" }, { opacity: 1, y: 0, rotation: 4, duration: 0.45, ease: "back.out(2)" }, july - 0.25);
+  tl.to("#s8-deck", { attr: { d: "M-40 1120 Q540 840 1120 1120 L1120 1204 Q540 924 -40 1204 Z" }, duration: 1.0, ease: "power2.inOut" }, july);
+  tl.to("#s8-rail", { attr: { d: "M-40 1060 Q540 780 1120 1060" }, duration: 1.0, ease: "power2.inOut" }, july);
+  tl.to("#s8-patch", { y: -140, duration: 1.0, ease: "power2.inOut" }, july);
+  tl.to("#s8-lines", { opacity: 0, duration: 0.3 }, july);
+  tl.to("#pip8", { y: -140, duration: 1.0, ease: "power2.inOut" }, july);
+  fx.face("pip8", "shocked", at("L5:bump") - 0.08);
+  fx.pose("pip8", "cheer", at("L5:bump") - 0.05, 0.2);
+  fx.hop("pip8", at("L5:bump"), 60);
+  fx.kick("#s8-cam", at("L5:bump"), 10);
+  fx.look("pip8", -1, july);
+  fx.cam("#s8-cam", { scale: 1.08 }, S.start, 1.2, "540 1300");
+</script>

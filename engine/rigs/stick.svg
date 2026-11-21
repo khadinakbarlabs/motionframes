@@ -1,24 +1,24 @@
 <!-- toonshorts rig: "stick" — big white head, thick ink limbs, feet on y=0, facing +x, ~330 px tall at scale 1.
      Use in a scene:  <rig type="stick" id="max" x="300" y="1500" scale="1" shirt="#ff6b4a" />
      Parts (animate these ids): {{id}} (whole, x/y moves), {{id}}-body, {{id}}-head, {{id}}-eyes,
-     {{id}}-mouth (closed), {{id}}-mouthO (open), {{id}}-brows, {{id}}-armL, {{id}}-armR, {{id}}-legL, {{id}}-legR, {{id}}-prop (empty slot in the front hand) -->
+     {{id}}-mouth (closed), {{id}}-mouthO (open), {{id}}-brows, {{id}}-armL, {{id}}-armR, {{id}}-legL, {{id}}-legR, {{id}}-prop (empty slot in the front hand), {{id}}-headbob. Joint groups carry invisible pivot circles (rotate about "50% 50%") -->
 <g transform="translate({{x}} {{y}}) scale({{scale}})">
   <g id="{{id}}" stroke="{{ink}}" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <ellipse cx="0" cy="0" rx="58" ry="10" fill="{{ink}}" stroke="none" opacity="0.22" />
     <g id="{{id}}-body">
-      <g id="{{id}}-legL"><path d="M-4 -120 Q-10 -60 -16 -4" stroke-width="11" /><path d="M-16 -4 h-18" stroke-width="11" /></g>
-      <g id="{{id}}-legR"><path d="M4 -120 Q10 -60 16 -4" stroke-width="11" /><path d="M16 -4 h18" stroke-width="11" /></g>
-      <g id="{{id}}-armL"><path d="M0 -205 Q-30 -170 -44 -128" stroke-width="10" /><circle cx="-44" cy="-126" r="6" fill="{{ink}}" stroke="none" /></g>
+      <g id="{{id}}-legL"><circle cx="-4" cy="-120" r="125" fill="none" stroke="none" /><path d="M-4 -120 Q-10 -60 -16 -4" stroke-width="11" /><path d="M-16 -4 h-18" stroke-width="11" /></g>
+      <g id="{{id}}-legR"><circle cx="4" cy="-120" r="125" fill="none" stroke="none" /><path d="M4 -120 Q10 -60 16 -4" stroke-width="11" /><path d="M16 -4 h18" stroke-width="11" /></g>
+      <g id="{{id}}-armL"><circle cx="0" cy="-205" r="95" fill="none" stroke="none" /><path d="M0 -205 Q-30 -170 -44 -128" stroke-width="10" /><circle cx="-44" cy="-126" r="6" fill="{{ink}}" stroke="none" /></g>
       <path d="M0 -222 Q4 -170 0 -118" stroke-width="12" />
       <path d="M-20 -214 Q0 -222 20 -214 L16 -150 Q0 -144 -16 -150 Z" fill="{{shirt}}" stroke-width="6" />
-      <g id="{{id}}-armR"><path d="M0 -205 Q30 -170 46 -130" stroke-width="10" /><circle cx="46" cy="-128" r="6" fill="{{ink}}" stroke="none" /><g id="{{id}}-prop" transform="translate(46 -128)"></g></g>
-      <g id="{{id}}-head">
+      <g id="{{id}}-armR"><circle cx="0" cy="-205" r="95" fill="none" stroke="none" /><path d="M0 -205 Q30 -170 46 -130" stroke-width="10" /><circle cx="46" cy="-128" r="6" fill="{{ink}}" stroke="none" /><g id="{{id}}-prop" transform="translate(46 -128)"></g></g>
+      <g id="{{id}}-headbob"><g id="{{id}}-head"><circle cx="0" cy="-222" r="125" fill="none" stroke="none" />
         <ellipse cx="0" cy="-280" rx="56" ry="60" fill="#ffffff" stroke-width="6" />
         <g id="{{id}}-brows" stroke-width="5"><path d="M-30 -306 q10 -6 20 0" /><path d="M12 -306 q10 -6 20 0" /></g>
         <g id="{{id}}-eyes" fill="{{ink}}" stroke="none"><ellipse cx="-18" cy="-284" rx="7" ry="9" /><ellipse cx="22" cy="-284" rx="7" ry="9" /></g>
         <path id="{{id}}-mouth" d="M-8 -252 q10 8 20 0" stroke-width="5" />
         <ellipse id="{{id}}-mouthO" cx="2" cy="-250" rx="9" ry="8" fill="{{ink}}" stroke="none" opacity="0" />
-      </g>
+      </g></g>
     </g>
   </g>
 </g>

@@ -1,7 +1,7 @@
 <!-- s2: the turn ("But ...") -->
-<rect width="1080" height="1920" fill="#6c4fb5" />
-<circle id="s2-dot" cx="540" cy="900" r="160" fill="#ffc93c" stroke="#0f1220" stroke-width="10" />
+<backdrop preset="studio" bg="#6c4fb5" spot="#a58ae6" horizon="1500" />
+<circle id="s2-dot" cx="540" cy="900" r="160" fill="#ffc93c" stroke="#0f1220" stroke-width="10" opacity="0" />
 <script>
   fx.pop("#s2-dot", S.start + 0.1);
-  fx.kick("#s2", at("L2:stranger"));
+  fx.kick("#s2-cam", at("L2:stranger"));
 </script>

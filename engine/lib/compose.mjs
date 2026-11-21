@@ -11,18 +11,28 @@
 //   </script>
 //
 // Each scene is wrapped as <g id="<sid>"><g id="<sid>-creep"><g id="<sid>-cam">markup</g></g></g>,
-// so scene code animates "#<sid>-cam" for camera moves while the engine keeps a slow creep running.
+// so scene code animates "#<sid>-cam" for camera moves while the engine runs the scene's own camera move
+// (short.json scene "cam": push | pull | pan-left | pan-right | rise | still | none | auto) on "#<sid>-creep",
+// with parallax for every <g data-depth> layer, and the transition into the scene ("in": whip | whip-right |
+// push | iris | fade | cut | auto). Every <rig> is kept alive (breathe, blink, head drift, lip sync on "talks").
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { captionCss, captionMarkup } from "./captions.mjs";
+import { expandBackdrops } from "./backdrops.mjs";
 
 const ENGINE = join(dirname(fileURLToPath(import.meta.url)), "..");
 const GSAP = "https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js";
 
 const RIG_DEFAULTS = {
   x: 540, y: 1500, scale: 1, shirt: "#ff6b4a", skin: "#f6c9a0", hat: "#ffc93c", prop: "clipboard",
+  pants: "#34405e", shoe: "#2b2f45",
 };
+// attributes the engine reads for auto acting (not passed into the art)
+const ACTING = ["face", "pose", "talks", "life"];
+
+// scene camera moves the engine picks when a scene does not say ("auto")
+const AUTO_CAM = ["push", "pan-left", "push", "pan-right", "rise"];
 
 function parseAttrs(s) {
   return Object.fromEntries([...s.matchAll(/([\w-]+)\s*=\s*"([^"]*)"/g)].map((m) => [m[1], m[2]]));
@@ -34,13 +44,14 @@ function loadRig(type) {
   return readFileSync(p, "utf8").replace(/<!--[\s\S]*?-->\s*/g, "");
 }
 
-export function expandRigs(markup, palette) {
+export function expandRigs(markup, palette, rigs = []) {
   return markup.replace(/<rig\s+([^>]*?)\/?>(?:\s*<\/rig>)?/g, (_, attrStr) => {
-    const a = { ink: palette.ink, limb: palette.ink, ...RIG_DEFAULTS, ...parseAttrs(attrStr) };
+    const a = { ink: palette.ink, limb: palette.ink, hot: palette.hot || "#ffc93c", ...RIG_DEFAULTS, ...parseAttrs(attrStr) };
+    rigs.push(Object.fromEntries([["id", a.id], ...ACTING.map((k) => [k, a[k]])]));
     if (!a.type) throw new Error(`<rig> needs a type: <rig ${attrStr}>`);
     if (!a.id) throw new Error(`<rig> needs an id: <rig ${attrStr}>`);
     let svg = loadRig(a.type).replace(/\{\{(\w+)\}\}/g, (m, k) => (a[k] !== undefined ? a[k] : m));
-    svg = svg.replace(/<g id="[^"]*-(?:hat|prop)" data-(?:hat|prop)="none">[\s\S]*?<\/g>\s*/g, "");
+    svg = svg.replace(/<g id="[^"]*-(?:hat|prop)" data-(?:hat|prop)="none"[^>]*>[\s\S]*?<\/g>\s*/g, "");
     const left = svg.match(/\{\{\w+\}\}/);
     if (left) throw new Error(`rig "${a.id}": no value for ${left[0]}`);
     return svg;
@@ -69,27 +80,43 @@ export function compose(model, { captions, sfxClips = [], music = "" }) {
   const { spec, lines, scenes, duration: DUR } = model;
   const { width: W, height: H, fps, palette } = spec;
 
-  const parts = scenes.map((s) => ({ s, ...readScene(model.dir, s) }));
+  const parts = scenes.map((s) => {
+    const src = readScene(model.dir, s);
+    const bd = expandBackdrops(src.markup, s.id, { width: W, height: H, ink: palette.ink });
+    const rigs = [];
+    const markup = expandRigs(bd.markup, palette, rigs);
+    return { s, ...src, markup, layers: bd.layers, bdJs: bd.js, rigs };
+  });
   const svgBody = parts.map(({ s, markup }, i) =>
-    `<g id="${s.id}" class="scene" opacity="${i === 0 ? 1 : 0}"><g id="${s.id}-creep"><g id="${s.id}-cam">\n${indent(expandRigs(markup, palette), 2)}\n</g></g></g>`
+    `<defs><filter id="${s.id}-blurf" x="-20%" y="0" width="140%" height="100%"><feGaussianBlur id="${s.id}-blur" stdDeviation="0 0" /></filter>` +
+    `<clipPath id="${s.id}-irisclip"><circle id="${s.id}-iris" cx="${(s.irisAt || `${W / 2} ${H * 0.55}`).split(" ")[0]}" cy="${(s.irisAt || `${W / 2} ${H * 0.55}`).split(" ")[1]}" r="0" /></clipPath></defs>\n` +
+    `<g id="${s.id}" class="scene" opacity="${i === 0 ? 1 : 0}"><g id="${s.id}-creep"><g id="${s.id}-cam">\n${indent(markup, 2)}\n</g></g></g>`
   ).join("\n");
   checkIds(svgBody);
+  for (const { s, code } of parts) {
+    if (!/immediateRender/.test(code) && /fromTo\([^;]*?,\s*\{[^}]*\bopacity:\s*1\b[^}]*\}\s*,\s*\{[^}]*\bopacity:\s*0/.test(code))
+      model.warnings.push(`scene ${s.id}: a fromTo() starts at opacity 1, so it shows before it plays (add immediateRender: false, or use fx.pop/fx.flash)`);
+  }
 
   const cap = captionMarkup(captions);
   const voice = lines.map((l) =>
     `      <audio id="vo-${l.id}" class="clip" src="${l.audio}" data-start="${l.start}" data-duration="${l.dur}" data-volume="${l.volume}" data-track-index="2"></audio>`
   ).join("\n");
 
-  // scene switching + creep (no frame is ever fully static)
-  const sceneJs = parts.map(({ s, code }, i) => {
-    const len = +(s.end - s.start).toFixed(3);
-    const creep = s.creep ?? spec.creep ?? 1.04;
-    const sw = i === 0 ? "" : s.cut === "fade"
-      ? `      fx.swap("#${parts[i - 1].s.id}", "#${s.id}", ${Math.max(0, s.start - 0.2)}, 0.4);\n`
-      : `      tl.set("#${parts[i - 1].s.id}", { opacity: 0 }, ${s.start}).set("#${s.id}", { opacity: 1 }, ${s.start});\n`;
-    const cr = creep === 1 ? "" : `      tl.fromTo("#${s.id}-creep", { scale: 1, svgOrigin: "${W / 2} ${H / 2}" }, { scale: ${creep}, duration: ${len}, ease: "none" }, ${s.start});\n`;
-    return `      // ---------- ${s.id} (${s.file}) ${s.start}s - ${s.end}s ----------\n${sw}${cr}` +
-      `      (function (tl, at, fx, S, L) {\n${indent(code.trim(), 8)}\n      })(tl, at, fx, SCENES_BY_ID["${s.id}"], LINES_BY_ID);`;
+  // scene switching + camera move with parallax + auto acting (no frame is ever fully static)
+  const sceneJs = parts.map(({ s, code, layers, bdJs, rigs }, i) => {
+    const prev = parts[i - 1]?.s;
+    const type = s.inType;
+    const sw = i === 0 ? "" : `      fx.transition("#${prev.id}", "#${s.id}", ${s.start}, ${JSON.stringify(type)});\n`;
+    let cam = s.cam ?? spec.cam ?? "auto";
+    if (s.creep !== undefined && s.cam === undefined) cam = s.creep === 1 ? "still" : { type: "push", amt: s.creep - 1 };
+    if (cam === "auto") cam = AUTO_CAM[i % AUTO_CAM.length];
+    const mv = cam === "none" ? "" : `      fx.sceneMove("${s.id}", ${s.start}, ${s.end}, ${JSON.stringify(cam)}, ${JSON.stringify(layers)});\n`;
+    const life = rigs.filter((r) => r.life !== "off").map((r, k) =>
+      `        fx.alive("${r.id}", S.start, S.end, { seed: ${i * 10 + k + 1}, talks: ${JSON.stringify((r.talks || "").split(",").map((x) => x.trim()).filter(Boolean))}, face: ${JSON.stringify(r.face || null)}, pose: ${JSON.stringify(r.pose || null)} });`
+    ).join("\n");
+    return `      // ---------- ${s.id} (${s.file}) ${s.start}s - ${s.end}s ----------\n${sw}${mv}` +
+      `      (function (tl, at, fx, S, L) {\n${bdJs ? indent(bdJs.trim(), 2) + "\n" : ""}${indent(code.trim(), 8)}\n${life ? life + "\n" : ""}      })(tl, at, fx, SCENES_BY_ID["${s.id}"], LINES_BY_ID);`;
   }).join("\n\n");
 
   const lean = lines.map(({ id, start, end, words }) => ({ id, start, end, words }));

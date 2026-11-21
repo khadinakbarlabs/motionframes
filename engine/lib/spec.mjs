@@ -78,6 +78,17 @@ export function loadModel(dir, { needWords = true } = {}) {
     .sort((a, b) => a.start - b.start);
   scenes[0].start = 0;
   scenes.forEach((s, i) => { s.end = scenes[i + 1]?.start ?? duration; });
+  // transition into each scene: "in" (or legacy "cut"), else short.json "transition", else auto
+  const AUTO_IN = ["whip", "push", "whip-right", "push"];
+  const KNOWN = ["whip", "whip-left", "whip-right", "push", "iris", "fade", "cut"];
+  scenes.forEach((s, i) => {
+    if (i === 0) { s.inType = null; return; }
+    let type = s.in ?? s.cut ?? spec.transition ?? "auto";
+    if (type === "hard") type = "cut";
+    if (type === "auto") type = AUTO_IN[(i - 1) % AUTO_IN.length];
+    if (!KNOWN.includes(type)) throw new Error(`scene ${s.id}: unknown transition "${type}" (use ${KNOWN.join(", ")} or auto)`);
+    s.inType = type;
+  });
   for (const s of scenes) if (s.end - s.start < 0.5) warnings.push(`scene ${s.id} is only ${(s.end - s.start).toFixed(2)} s long`);
 
   return { dir, spec, lines, scenes, duration, at: makeAnchor(lines, scenes), warnings };

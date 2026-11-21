@@ -1,0 +1,35 @@
+<!-- s4: so he does what a good inspector would do: he fills it -->
+<backdrop preset="sunset" horizon="1330" ground="water" sun="790 860" seed="4" />
+<g id="s4-deck" stroke="#0f1220" stroke-width="9" stroke-linejoin="round">
+  <rect x="150" y="1350" width="130" height="520" fill="#c79a74" /><rect x="800" y="1350" width="130" height="520" fill="#c79a74" />
+  <path d="M150 1400 h130 M800 1400 h130" stroke-width="5" opacity="0.5" />
+  <rect x="-60" y="1260" width="560" height="100" fill="#f3dcb4" /><rect x="580" y="1260" width="560" height="100" fill="#f3dcb4" />
+  <rect x="-60" y="1322" width="560" height="38" fill="#d6b07e" stroke="none" /><rect x="580" y="1322" width="560" height="38" fill="#d6b07e" stroke="none" />
+  <path d="M-60 1322 H500 M580 1322 H1140" stroke-width="5" />
+  <path d="M-60 1190 H500 M580 1190 H1140" stroke-width="12" />
+  <path d="M-20 1190 v70 M60 1190 v70 M140 1190 v70 M220 1190 v70 M300 1190 v70 M380 1190 v70 M460 1190 v70 M620 1190 v70 M700 1190 v70 M780 1190 v70 M860 1190 v70 M940 1190 v70 M1020 1190 v70 M1100 1190 v70" stroke-width="8" />
+</g>
+<path d="M10 1290 h70 M150 1290 h70 M290 1290 h70 M650 1290 h70 M790 1290 h70 M930 1290 h70" stroke="#ffffff" stroke-width="9" stroke-linecap="round" />
+<g id="s4-fill" opacity="0">
+  <rect x="500" y="1260" width="80" height="100" fill="#7a6552" stroke="#0f1220" stroke-width="7" />
+  <path d="M512 1282 l14 9 M548 1318 l16 -7 M516 1338 l12 -5" stroke="#0f1220" stroke-width="5" stroke-linecap="round" />
+</g>
+<g id="s4-bag" opacity="0">
+  <path d="M600 1020 l90 -40 l40 90 l-90 40 Z" fill="#d9c08a" stroke="#0f1220" stroke-width="7" stroke-linejoin="round" />
+  <text x="660" y="1070" transform="rotate(-24 660 1070)" text-anchor="middle" font-family="Archivo Black" font-size="34" fill="#0f1220">FILL</text>
+</g>
+<path id="s4-pour" d="M610 1100 Q560 1170 545 1260" stroke="#9c7f5e" stroke-width="22" stroke-linecap="round" fill="none" opacity="0" />
+<rig type="bean" id="pip4" x="350" y="1262" scale="1.15" shirt="#2ec4b6" face="thinking" pose="think" />
+<script>
+  fx.nod("pip4", at("L2:good"), 2);
+  fx.face("pip4", "happy", at("L2:He#2") - 0.3);
+  fx.pose("pip4", "present", at("L2:He#2") - 0.2);
+  fx.pop("#s4-bag", at("L2:He#2") - 0.2);
+  tl.to("#s4-pour", { opacity: 1, duration: 0.1 }, at("L2:filled") - 0.2).to("#s4-pour", { opacity: 0, duration: 0.2 }, at("L2:filled") + 0.4);
+  fx.pop("#s4-fill", at("L2:filled"), { from: 0.2, origin: "50% 100%" });
+  fx.out("#s4-bag", at("L2:filled") + 0.5);
+  fx.face("pip4", "proud", at("L2:filled") + 0.2);
+  fx.hop("pip4", at("L2:filled") + 0.45, 70);
+  fx.pose("pip4", "cheer", at("L2:filled") + 0.4);
+  fx.cam("#s4-cam", { scale: 1.2 }, at("L2:filled") - 0.4, 0.7, "470 1000");
+</script>

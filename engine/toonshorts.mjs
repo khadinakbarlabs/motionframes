@@ -1,26 +1,22 @@
 #!/usr/bin/env node
 // toonshorts: one spec (short.json) + scene files -> a finished vertical short, rendered by HyperFrames.
 //
-//   node toonshorts.mjs setup  .                         one-time: install the free local voice (Kokoro) into ~/.cache/toonshorts
-//   node toonshorts.mjs init   <dir> [--rig stick|bean]   scaffold short.json + scenes/
-//   node toonshorts.mjs voice  <dir> [--voice am_michael] [--speed 1] [--force]   free local voice (Kokoro) for lines with no audio
-//   node toonshorts.mjs words  <dir> [--force]           word timings for every line (local whisper)
-//   node toonshorts.mjs sfx    <dir>                     find + measure every sound the spec asks for (free, logged licences)
-//   node toonshorts.mjs build  <dir>                     write index.html
-//   node toonshorts.mjs check  <dir>                     HyperFrames lint
-//   node toonshorts.mjs stills <dir> [--at 1,5,9]        snapshot frames to look at
-//   node toonshorts.mjs mix    <dir>                     audio-only preview + loudness (no render)
-//   node toonshorts.mjs render <dir> [--quality draft]   render mp4, normalise to -14 LUFS, run qa
-//   node toonshorts.mjs qa     <dir> <file.mp4>          black / frozen / silence / loudness checks
-//   node toonshorts.mjs make   <dir>                     voice + words + sfx + build + check + mix (everything but render)
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, cpSync } from "node:fs";
-import { join, resolve, dirname, basename } from "node:path";
+//   toonshorts go      <dir> [--draft] [--no-render]   EVERYTHING: voice, words, sounds, build, check, preview, render, QA
+//   toonshorts preview <dir>                          build + one still per scene -> snaps/preview/contact-sheet.jpg
+//   toonshorts init    <dir> [--rig bean|stick]        scaffold short.json + scenes/
+//   toonshorts doctor  .                              check node, ffmpeg, HyperFrames, voice, sound library
+//   toonshorts setup   .                              one-time: install the free local voice (Kokoro)
+//   single steps: voice [--voice am_michael --speed 1 --force] | words [--force] | sfx | build | check
+//                 stills [--at 1,5,9] | mix | render [--draft] | qa <file.mp4>
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, cpSync, rmSync, readdirSync } from "node:fs";
+const require_fs = { readdirSync };
+import { join, resolve, dirname, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { tmpdir, homedir } from "node:os";
 import { loadModel, readSpec, wordsPathFor } from "./lib/spec.mjs";
 import { captionGroups } from "./lib/captions.mjs";
-import { planCues, placeCues, resolveSfx, readLock, intentsOf, musicClip } from "./lib/sfx.mjs";
+import { planCues, placeCues, resolveSfx, readLock, intentsOf, musicClip, LIBRARY } from "./lib/sfx.mjs";
 import { compose } from "./lib/compose.mjs";
 import { mixPreview, qaVideo, normalize } from "./lib/qa.mjs";
 
@@ -31,142 +27,255 @@ const flag = (name, dflt) => { const i = rest.indexOf(`--${name}`); return i < 0
 const log = (...a) => console.log(...a);
 const VENV = join(homedir(), ".cache", "toonshorts", "kokoro");
 const VPY = join(VENV, "bin", "python");
-const hfEnv = () => (existsSync(VPY) && !process.env.HYPERFRAMES_PYTHON ? { ...process.env, HYPERFRAMES_PYTHON: VPY } : process.env);
-const hf = (args, opts = {}) => execFileSync("npx", ["-y", HF, ...args], { stdio: "inherit", env: hfEnv(), ...opts });
+const rel = (p) => { const r = relative(process.cwd(), p) || "."; return r.startsWith("../..") ? p : r; };
+const secs = (ms) => (ms / 1000).toFixed(1) + "s";
+
+// npm needs a writable cache for npx. Inside a sandbox ~/.npm is often read-only: fall back to a temp cache.
+function npmEnv() {
+  const env = { ...process.env };
+  if (existsSync(VPY) && !env.HYPERFRAMES_PYTHON) env.HYPERFRAMES_PYTHON = VPY;
+  if (!env.npm_config_cache) {
+    try { const p = join(homedir(), ".npm", "_cacache", "tmp"); mkdirSync(p, { recursive: true }); writeFileSync(join(p, ".toonshorts-probe"), ""); }
+    catch { env.npm_config_cache = join(tmpdir(), "toonshorts-npm"); }
+  }
+  return env;
+}
+const ENV = npmEnv();
+
+// Turns a failed HyperFrames call into the real reason plus what to do about it.
+function explain(out) {
+  const s = String(out || "");
+  if (/EPERM|root-owned files|EACCES/.test(s) && /npm/.test(s)) return "npm cannot write its cache folder. Run outside the sandbox, or set npm_config_cache to a writable folder.";
+  if (/ENOTFOUND|EAI_AGAIN|network/i.test(s)) return "no network: HyperFrames is downloaded by npx on first use.";
+  if (/whisper|transcri/i.test(s) && /not found|No module/i.test(s)) return "local whisper is missing: run \"toonshorts setup .\" once.";
+  const lines = s.split("\n").map((l) => l.trim()).filter((l) => l && !/trust settings|^\[INFO\]|^npm (notice|warn)/.test(l));
+  return lines.slice(-4).join(" | ").slice(0, 400) || "no output";
+}
+function hf(args, { cwd, quiet = true } = {}) {
+  const r = spawnSync("npx", ["-y", HF, ...args], { cwd, env: ENV, encoding: "utf8", maxBuffer: 1 << 28, stdio: quiet ? ["ignore", "pipe", "pipe"] : "inherit" });
+  const out = (r.stdout || "") + (r.stderr || "");
+  if (r.status !== 0) { const e = new Error(`hyperframes ${args[0]} failed: ${explain(out)}`); e.out = out; throw e; }
+  return out;
+}
 
 function writeSpec(dir, spec) {
   const raw = JSON.parse(readFileSync(join(dir, "short.json"), "utf8"));
   writeFileSync(join(dir, "short.json"), JSON.stringify({ ...raw, lines: spec.lines }, null, 2) + "\n");
 }
 
+// one sheet, frames in time order, 5 per row (HyperFrames splits big sets into several sheets)
+function contactSheet(folder) {
+  const { readdirSync } = require_fs;
+  const frames = readdirSync(folder).filter((f) => /^frame-.*\.png$/.test(f)).sort();
+  if (!frames.length) return null;
+  const cols = Math.min(5, frames.length), rows = Math.ceil(frames.length / cols), out = join(folder, "sheet.jpg");
+  const args = ["-v", "error", "-y"];
+  frames.forEach((f) => args.push("-i", join(folder, f)));
+  const pads = cols * rows - frames.length;
+  const chain = frames.map((_, i) => `[${i}]scale=324:-1[f${i}]`).join(";") +
+    (pads ? ";" + Array.from({ length: pads }, (_, k) => `color=c=#16181f:s=324x576:d=1[p${k}]`).join(";") : "") + ";" +
+    frames.map((_, i) => `[f${i}]`).join("") + Array.from({ length: pads }, (_, k) => `[p${k}]`).join("") +
+    `xstack=inputs=${cols * rows}:layout=${Array.from({ length: cols * rows }, (_, i) => `${(i % cols) * 324}_${Math.floor(i / cols) * 576}`).join("|")}[o]`;
+  execFileSync("ffmpeg", [...args, "-filter_complex", chain, "-map", "[o]", "-frames:v", "1", "-q:v", "3", out]);
+  return out;
+}
+
 const commands = {
   setup() {
-    if (existsSync(VPY)) { log(`  voice runtime already installed: ${VENV}`); return; }
+    if (existsSync(VPY)) return `voice runtime already installed: ${VENV}`;
     log(`  installing Kokoro (free local voice) into ${VENV} ...`);
     mkdirSync(dirname(VENV), { recursive: true });
     execFileSync("python3", ["-m", "venv", VENV], { stdio: "inherit" });
     execFileSync(VPY, ["-m", "pip", "install", "-q", "kokoro-onnx", "soundfile"], { stdio: "inherit" });
-    log("  done: \"toonshorts voice\" now works offline");
+    return "voice runtime installed: \"toonshorts voice\" now works offline";
+  },
+
+  doctor() {
+    const row = (ok, what, fix = "") => log(`  ${ok ? "ok  " : "MISS"} ${what}${ok || !fix ? "" : `  -> ${fix}`}`);
+    row(Number(process.versions.node.split(".")[0]) >= 20, `node ${process.versions.node}`, "install Node 20+");
+    const ff = spawnSync("ffmpeg", ["-version"], { encoding: "utf8" });
+    row(ff.status === 0, `ffmpeg ${(ff.stdout || "").split(" ")[2] || ""}`, "brew install ffmpeg");
+    let ver = ""; try { ver = hf(["--version"]).trim().split("\n").pop(); } catch (e) { ver = ""; }
+    row(!!ver, `HyperFrames ${ver || HF}`, "needs network once for npx");
+    row(existsSync(VPY), "Kokoro voice", "toonshorts setup .");
+    let n = 0; try { n = Object.keys(JSON.parse(readFileSync(join(LIBRARY, "index.json"), "utf8"))).length; } catch {}
+    row(true, `sound library: ${n} sounds in ${LIBRARY}`);
+    if (ENV.npm_config_cache) row(true, `npm cache: using ${ENV.npm_config_cache} (~/.npm is read-only here)`);
+    return "doctor done";
   },
 
   init(dir) {
-    if (existsSync(join(dir, "short.json"))) throw new Error(`${dir}/short.json already exists`);
-    const rig = flag("rig", "stick");
+    if (existsSync(join(dir, "short.json"))) throw new Error(`${rel(dir)}/short.json already exists`);
+    const rig = flag("rig", "bean");
     cpSync(join(HERE, "..", "templates", "starter"), dir, { recursive: true });
-    const p = join(dir, "scenes", "s1.html");
-    writeFileSync(p, readFileSync(p, "utf8").replaceAll("__RIG__", rig));
-    log(`scaffolded ${dir}: edit short.json (lines + scenes), write scenes/*.html, then "toonshorts make ${dir}"`);
+    for (const f of ["s1.html", "s2.html"]) { const p = join(dir, "scenes", f); if (existsSync(p)) writeFileSync(p, readFileSync(p, "utf8").replaceAll("__RIG__", rig)); }
+    return `scaffolded ${rel(dir)}: edit short.json (lines + scenes) and scenes/*.html, then "toonshorts go ${rel(dir)}"`;
   },
 
   voice(dir) {
     const spec = readSpec(dir);
     const voice = flag("voice", spec.voice || "am_michael"), speed = flag("speed", spec.speed || 1);
     mkdirSync(join(dir, "assets"), { recursive: true });
+    let made = 0;
     const lines = spec.lines.map((l) => {
       if (l.audio && existsSync(join(dir, l.audio)) && !flag("force", false)) return l;
       const audio = l.audio || `assets/vo-${l.id}.wav`;
-      log(`  voicing ${l.id} (${voice}): "${l.text.slice(0, 60)}${l.text.length > 60 ? "..." : ""}"`);
-      try {
-        hf(["tts", l.text, "--voice", String(voice), "--speed", String(speed), "-o", join(dir, audio)], { stdio: ["ignore", "ignore", "inherit"] });
-      } catch {
-        throw new Error(`voice failed for ${l.id}. First time? Run "toonshorts setup ." once (installs the free Kokoro voice), or record your own lines and set "audio".`);
-      }
+      log(`  voicing ${l.id} (${voice}): "${l.text.slice(0, 50)}${l.text.length > 50 ? "..." : ""}"`);
+      try { hf(["tts", l.text, "--voice", String(voice), "--speed", String(speed), "-o", join(dir, audio)]); }
+      catch (e) { throw new Error(`voice failed for ${l.id}: ${e.message}\n  First time? Run "toonshorts setup ." once, or record your own lines and set "audio".`); }
+      made++;
       return { ...l, audio };
     });
     writeSpec(dir, { lines });
+    return made ? `${made} line(s) voiced` : `${lines.length} lines already have audio`;
   },
 
   words(dir) {
     const spec = readSpec(dir);
+    let made = 0;
     for (const l of spec.lines) {
-      if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio: run "toonshorts voice ${dir}" or set "audio"`);
+      if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio: run "toonshorts voice ${rel(dir)}" or set "audio"`);
       const wp = join(dir, wordsPathFor(l.audio));
       if (existsSync(wp) && !flag("force", false)) continue;
       log(`  timing words: ${l.id}`);
       const work = join(tmpdir(), `toonshorts-words-${l.id}-${process.pid}`);
       mkdirSync(work, { recursive: true });
-      const out = execFileSync("npx", ["-y", HF, "transcribe", resolve(dir, l.audio), "--json", "-d", work], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
-      const res = JSON.parse(out.trim().split("\n").filter((x) => x.startsWith("{")).pop());
-      if (!res.ok) throw new Error(`transcribe failed for ${l.id}: ${out.slice(0, 200)}`);
+      const out = hf(["transcribe", resolve(dir, l.audio), "--json", "-d", work]);
+      const objs = out.split("\n").filter((x) => x.trim().startsWith("{")).map((x) => { try { return JSON.parse(x); } catch { return null; } });
+      const res = objs.filter((o) => o && "ok" in o).pop() || {};
+      if (!res.ok) throw new Error(`transcribe failed for ${l.id}: ${explain(out)}`);
       copyFileSync(res.transcriptPath, wp);
+      made++;
     }
+    return made ? `timed words for ${made} line(s)` : `all ${spec.lines.length} lines already timed`;
   },
 
   sfx(dir) {
     const model = loadModel(dir);
     const cues = planCues(model, captionGroups(model));
-    const lock = resolveSfx(dir, intentsOf(cues.filter((c) => c.sfx)), log);
-    log(`  ${Object.keys(lock).length} sounds locked in sfx.lock.json; credits in SOUND-CREDITS.md`);
+    const { lock, missing } = resolveSfx(dir, intentsOf(cues.filter((c) => c.sfx && !c.bed).concat(cues.filter((c) => c.bed))), (m) => log(m));
+    const n = Object.keys(lock).length;
+    if (missing.length) log(`  warn: ${missing.length} sound(s) not found, their cues are skipped: ${missing.join(", ")}`);
+    return `${n} sounds ready (credits in SOUND-CREDITS.md)${missing.length ? `, ${missing.length} missing` : ""}`;
   },
 
   build(dir) {
     const model = loadModel(dir);
-    model.warnings.forEach((w) => log(`  warn: ${w}`));
     const captions = captionGroups(model);
     const cues = planCues(model, captions);
     const lock = readLock(dir);
-    const missing = intentsOf(cues).filter((i) => !lock[i]);
-    if (missing.length) throw new Error(`sounds not found yet (${missing.join(", ")}): run "toonshorts sfx ${dir}"`);
     const sfxClips = placeCues(model, cues, lock, 4);
     const html = compose(model, { captions, sfxClips, music: musicClip(model) });
+    model.warnings.forEach((w) => log(`  warn: ${w}`));
     writeFileSync(join(dir, "index.html"), html);
     if (!existsSync(join(dir, "hyperframes.json"))) writeFileSync(join(dir, "hyperframes.json"), JSON.stringify({ paths: { assets: "assets" } }, null, 2) + "\n");
-    log(`  built index.html: ${model.duration}s, ${model.scenes.length} scenes, ${model.lines.length} lines, ${captions.length} captions, ${sfxClips.length} sound clips`);
+    const tr = model.scenes.slice(1).map((s) => s.inType);
+    return `${model.duration}s, ${model.scenes.length} scenes (${[...new Set(tr)].join("/")}), ${captions.length} captions, ${sfxClips.length} sound clips`;
   },
 
   check(dir) {
-    let out;
-    try { out = hf(["check", "--json"], { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }); }
-    catch (e) { out = e.stdout || ""; }
-    const r = JSON.parse(out.slice(out.indexOf("{")));
-    const sections = ["lint", "runtime", "layout", "motion", "contrast", "craft", "audio"].filter((k) => r[k]);
-    const finds = sections.flatMap((k) => (r[k].findings || []).map((f) => ({ k, ...f })));
+    if (!existsSync(join(dir, "index.html"))) throw new Error(`no index.html yet: run "toonshorts build ${rel(dir)}" first`);
+    const r = spawnSync("npx", ["-y", HF, "check", "--json"], { cwd: dir, env: ENV, encoding: "utf8", maxBuffer: 1 << 26 });
+    const out = r.stdout || "";
+    let j; try { j = JSON.parse(out.slice(out.indexOf("{"))); } catch { throw new Error(`hyperframes check gave no report: ${explain(out + r.stderr)}`); }
+    const sections = ["lint", "runtime", "layout", "motion", "contrast", "craft", "audio"].filter((k) => j[k]);
+    const NOISE = ["composition_file_too_large", "timeline_track_too_dense", "nested_structure_needs_subcomposition"]; // expected for one-file shorts
+    const finds = sections.flatMap((k) => (j[k].findings || []).map((f) => ({ k, ...f }))).filter((f) => !NOISE.includes(f.code));
     const errs = finds.filter((f) => f.severity === "error"), warns = finds.filter((f) => f.severity === "warning");
-    log(`  check: ${r.ok ? "OK" : "FAILED"}, ${errs.length} error(s), ${warns.length} warning(s)`);
-    for (const f of [...errs, ...warns]) log(`  ${f.severity === "error" ? "ERROR" : "warn "} [${f.k}/${f.code}] ${(f.message || "").slice(0, 180)}`);
-    if (!r.ok) throw new Error("fix the errors above, then build again");
+    for (const f of [...errs, ...warns]) log(`  ${f.severity === "error" ? "ERROR" : "warn "} [${f.k}/${f.code}] ${(f.message || "").slice(0, 160)}`);
+    if (!j.ok) throw new Error(errs.length ? "fix the errors above, then build again" : `check failed without findings: ${explain(out + r.stderr)}`);
+    return `${errs.length} errors, ${warns.length} warnings`;
   },
 
   stills(dir) {
     const at = flag("at", null);
+    rmSync(join(dir, "snaps", "stills"), { recursive: true, force: true });
     hf(["snapshot", ...(at ? ["--at", String(at)] : ["--frames", "8"]), "-o", "snaps/stills"], { cwd: dir });
+    return `contact sheet: ${rel(contactSheet(join(dir, "snaps", "stills")))}`;
+  },
+
+  preview(dir) {
+    commands.build(dir);
+    const model = loadModel(dir);
+    const at = model.scenes.map((s) => +(s.start + Math.min(s.end - s.start, 6) * 0.6).toFixed(2));
+    rmSync(join(dir, "snaps", "preview"), { recursive: true, force: true });
+    hf(["snapshot", "--at", at.join(","), "-o", "snaps/preview"], { cwd: dir });
+    return `one still per scene: ${rel(contactSheet(join(dir, "snaps", "preview")))}`;
   },
 
   mix(dir) {
     mkdirSync(join(dir, "snaps"), { recursive: true });
     const r = mixPreview(dir);
-    log(`  mix preview ${r.file}: ${r.clips} clips, ${r.lufs} LUFS, true peak ${r.truePeak} dBFS (render normalises to -14 LUFS)`);
     if (r.truePeak > -1) log("  warn: mix clips above -1 dBFS: lower the loudest cues");
+    return `${r.clips} clips, ${r.lufs} LUFS before normalising, peak ${r.truePeak} dBFS`;
   },
 
-  render(dir) {
+  async render(dir) {
     mkdirSync(join(dir, "renders"), { recursive: true });
     const raw = join(dir, "renders", "raw.mp4");
-    hf(["render", "-o", raw, "-q", String(flag("quality", "delivery"))], { cwd: dir });
+    const q = flag("draft", false) ? "draft" : String(flag("quality", "delivery"));
+    const tty = process.stdout.isTTY;
+    const once = () => new Promise((ok) => {
+      let shown = -1, tail = "";
+      const p = spawn("npx", ["-y", HF, "render", "-o", raw, "-q", q], { cwd: dir, env: ENV });
+      const onData = (b) => {
+        const s = b.toString(); tail = (tail + s).slice(-6000);
+        const ms = [...s.matchAll(/(\d{1,3})%/g)]; if (!ms.length) return;
+        const pct = Math.min(100, Number(ms.at(-1)[1])), step = Math.floor(pct / 10) * 10;
+        if (step > shown) { shown = step; tty ? process.stdout.write(`\r  rendering ${"#".repeat(step / 5).padEnd(20, ".")} ${step}%`) : log(`  rendering ${step}%`); }
+      };
+      p.stdout.on("data", onData); p.stderr.on("data", onData);
+      p.on("close", (code) => { if (tty) process.stdout.write("\n"); ok({ code, tail }); });
+    });
+    let r = await once();
+    // the headless browser sometimes drops its local connection: one clean retry fixes it
+    if (r.code !== 0 && /CAPTURE|ERR_SOCKET|ERR_CONNECTION|Target closed|timeout/i.test(r.tail)) { log("  render: browser capture dropped, retrying once"); r = await once(); }
+    if (r.code !== 0) throw new Error(`render failed: ${explain(r.tail)}`);
     const final = join(dir, "renders", `${basename(resolve(dir))}.mp4`);
     normalize(raw, final);
-    log(`  rendered ${final}`);
-    commands.qa(dir, final);
+    rmSync(raw, { force: true });
+    return `${rel(final)} (${q})`;
   },
 
   qa(dir, file = rest[0]) {
     if (!file) throw new Error("usage: toonshorts qa <dir> <file.mp4>");
     const r = qaVideo(dir, file);
-    log(r.pass ? "  QA PASS" : `  QA: ${r.issues.length} issue(s)\n  - ${r.issues.join("\n  - ")}`);
-    log(`  report: ${join(dir, "qa-report.md")}`);
+    if (!r.pass) { r.issues.forEach((i) => log(`  - ${i}`)); throw new Error(`QA found ${r.issues.length} issue(s): see ${rel(join(dir, "qa-report.md"))}`); }
+    return `PASS: ${r.lufs} LUFS, peak ${r.truePeak} dBFS, no black/frozen/silent stretches`;
   },
 
-  make(dir) {
-    for (const step of ["voice", "words", "sfx", "build", "check", "mix"]) { log(`> ${step}`); commands[step](dir); }
+  async go(dir) {
+    const steps = ["voice", "words", "sfx", "build", "check", "preview", "mix"];
+    if (!flag("no-render", false)) steps.push("render", "qa");
+    log(`toonshorts go ${rel(dir)}`);
+    const times = [];
+    const t0 = Date.now();
+    for (const [i, step] of steps.entries()) {
+      const label = `${i + 1}/${steps.length} ${step.padEnd(7)}`;
+      if (process.stdout.isTTY) process.stdout.write(`  ${label} ...`); else log(`  ${label} ...`);
+      const s = Date.now();
+      let msg;
+      try { msg = step === "qa" ? commands.qa(dir, join(dir, "renders", `${basename(resolve(dir))}.mp4`)) : await commands[step](dir); }
+      catch (e) { log(`  ${label} FAILED after ${secs(Date.now() - s)}`); throw e; }
+      times.push([step, Date.now() - s]);
+      if (process.stdout.isTTY) process.stdout.write("\r\x1b[2K");
+      log(`  ${label} done ${secs(Date.now() - s).padStart(6)}  ${msg}`);
+    }
+    writeFileSync(join(dir, "snaps", "timings.json"), JSON.stringify(Object.fromEntries(times.map(([k, v]) => [k, +(v / 1000).toFixed(1)])), null, 2) + "\n");
+    return `finished in ${secs(Date.now() - t0)}${flag("no-render", false) ? " (no render: look at the preview, then run go again without --no-render)" : ""}`;
   },
+
+  // kept for older notes: everything except render
+  make(dir) { rest.push("--no-render"); return commands.go(dir); },
 };
 
 if (!commands[cmd] || !dirArg) {
-  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 16).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
+  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 11).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
   process.exit(cmd ? 1 : 0);
 }
 try {
-  commands[cmd](resolve(dirArg));
+  const msg = await commands[cmd](resolve(dirArg));
+  if (msg) log(cmd === "go" ? `toonshorts: ${msg}` : `  ${cmd}: ${msg}`);
 } catch (e) {
   console.error(`toonshorts ${cmd}: ${e.message}`);
   process.exit(1);

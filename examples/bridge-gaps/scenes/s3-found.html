@@ -1,0 +1,34 @@
+<!-- s3: he finds the gap; a phone drops straight through it -->
+<backdrop preset="sunset" horizon="1330" ground="water" sun="790 860" seed="4" />
+<g id="s3-deck" stroke="#0f1220" stroke-width="9" stroke-linejoin="round">
+  <rect x="150" y="1350" width="130" height="520" fill="#c79a74" /><rect x="800" y="1350" width="130" height="520" fill="#c79a74" />
+  <path d="M150 1400 h130 M800 1400 h130" stroke-width="5" opacity="0.5" />
+  <rect x="-60" y="1260" width="560" height="100" fill="#f3dcb4" /><rect x="580" y="1260" width="560" height="100" fill="#f3dcb4" />
+  <rect x="-60" y="1322" width="560" height="38" fill="#d6b07e" stroke="none" /><rect x="580" y="1322" width="560" height="38" fill="#d6b07e" stroke="none" />
+  <path d="M-60 1322 H500 M580 1322 H1140" stroke-width="5" />
+  <path d="M-60 1190 H500 M580 1190 H1140" stroke-width="12" />
+  <path d="M-20 1190 v70 M60 1190 v70 M140 1190 v70 M220 1190 v70 M300 1190 v70 M380 1190 v70 M460 1190 v70 M620 1190 v70 M700 1190 v70 M780 1190 v70 M860 1190 v70 M940 1190 v70 M1020 1190 v70 M1100 1190 v70" stroke-width="8" />
+</g>
+<path d="M10 1290 h70 M150 1290 h70 M290 1290 h70 M650 1290 h70 M790 1290 h70 M930 1290 h70" stroke="#ffffff" stroke-width="9" stroke-linecap="round" />
+<g id="s3-phone" opacity="0">
+  <rect x="512" y="1000" width="56" height="98" rx="12" fill="#0f1220" />
+  <rect x="519" y="1010" width="42" height="72" rx="5" fill="#7fd3ff" />
+</g>
+<ellipse id="s3-splash" cx="540" cy="1400" rx="110" ry="22" fill="none" stroke="#ffffff" stroke-width="10" opacity="0" />
+<g id="s3-drops" fill="#ffffff" opacity="0"><circle cx="490" cy="1350" r="12" /><circle cx="540" cy="1320" r="15" /><circle cx="595" cy="1346" r="11" /></g>
+<rig type="bean" id="pip3" x="370" y="1262" scale="1.15" shirt="#2ec4b6" face="neutral" pose="hips" />
+<script>
+  fx.look("pip3", 1, at("L2:found") + 0.1);
+  fx.face("pip3", "surprised", at("L2:gap") - 0.05);
+  fx.pose("pip3", "point", at("L2:gap"));
+  fx.cam("#s3-cam", { scale: 1.18 }, at("L2:gap") - 0.2, 0.9, "500 1150");
+  const drop = at("L2:swallow") - 0.25;
+  tl.set("#s3-phone", { opacity: 1 }, drop);
+  tl.fromTo("#s3-phone", { y: 0, rotation: 0 }, { y: 330, rotation: 70, svgOrigin: "540 1049", duration: 0.45, ease: "power2.in", immediateRender: false }, drop);
+  tl.set("#s3-phone", { opacity: 0 }, drop + 0.45);
+  tl.fromTo("#s3-splash", { opacity: 1, scale: 0.3, svgOrigin: "540 1400" }, { opacity: 0, scale: 1.5, duration: 0.6, ease: "power2.out", immediateRender: false }, drop + 0.45);
+  tl.fromTo("#s3-drops", { opacity: 1, y: 40 }, { opacity: 0, y: -40, duration: 0.5, ease: "power2.out", immediateRender: false }, drop + 0.45);
+  fx.face("pip3", "shocked", drop + 0.4);
+  fx.pose("pip3", "reach", drop + 0.4, 0.25);
+  fx.squash("#pip3", drop + 0.35, { amt: 0.1 });
+</script>

@@ -1,0 +1,45 @@
+<!-- s7: Pip now inspects a lamp-lit tunnel; nothing grows here except his stack of paperwork, sheet by sheet -->
+<defs>
+  <radialGradient id="s9-lampg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe7a0" stop-opacity="0.9" /><stop offset="1" stop-color="#ffe7a0" stop-opacity="0" /></radialGradient>
+  <linearGradient id="s9-endg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4" /><stop offset="1" stop-color="#ffd27a" /></linearGradient>
+</defs>
+<rect width="1080" height="1920" fill="#1c1410" />
+<path d="M100 1560 V880 Q540 470 980 880 V1560 Z" fill="#5a3a2a" stroke="#0f1220" stroke-width="10" />
+<g stroke="#3e2619" stroke-width="5" fill="none" opacity="0.8">
+  <path d="M100 980 H240 M100 1100 H200 M100 1220 H240 M100 1340 H200 M100 1460 H240 M980 980 H840 M980 1100 H880 M980 1220 H840 M980 1340 H880 M980 1460 H840" />
+</g>
+<path d="M300 1560 V1040 Q540 820 780 1040 V1560 Z" fill="#3e2619" />
+<path d="M440 1560 V1180 Q540 1100 640 1180 V1560 Z" fill="url(#s9-endg)" opacity="0.85" />
+<path d="M100 1560 L440 1400 H640 L980 1560 Z" fill="#2b1d16" />
+<path d="M540 1410 V1440 M540 1470 V1510 M540 1530 V1560" stroke="#ffc93c" stroke-width="8" stroke-linecap="round" />
+<g id="s9-lamps">
+  <circle cx="230" cy="900" r="90" fill="url(#s9-lampg)" /><circle cx="230" cy="900" r="16" fill="#ffe7a0" stroke="#0f1220" stroke-width="4" />
+  <circle cx="850" cy="900" r="90" fill="url(#s9-lampg)" /><circle cx="850" cy="900" r="16" fill="#ffe7a0" stroke="#0f1220" stroke-width="4" />
+</g>
+<rect x="0" y="1560" width="1080" height="360" fill="#140e0b" />
+<g id="s9-stack" stroke="#0f1220" stroke-width="5" stroke-linejoin="round">
+  <rect x="660" y="1515" width="170" height="45" rx="4" fill="#f3eadb" />
+  <rect id="s9-p1" x="664" y="1470" width="166" height="45" rx="4" fill="#fffaf0" opacity="0" />
+  <rect id="s9-p2" x="656" y="1425" width="170" height="45" rx="4" fill="#f3eadb" opacity="0" />
+  <rect id="s9-p3" x="668" y="1380" width="164" height="45" rx="4" fill="#fffaf0" opacity="0" />
+  <rect id="s9-p4" x="658" y="1335" width="170" height="45" rx="4" fill="#f3eadb" opacity="0" />
+  <rect id="s9-p5" x="666" y="1290" width="166" height="45" rx="4" fill="#fffaf0" opacity="0" />
+  <rect id="s9-p6" x="660" y="1245" width="170" height="45" rx="4" fill="#f3eadb" opacity="0" />
+  <rect id="s9-p7" x="670" y="1200" width="164" height="45" rx="4" fill="#fffaf0" opacity="0" />
+</g>
+<rig type="bean" id="pip9" x="400" y="1560" scale="1.15" shirt="#2ec4b6" hat="#ffc93c" prop="none" face="neutral" />
+<script>
+  fx.face("pip9", "happy", at("L5:nothing") - 0.1);
+  fx.pose("pip9", "present", at("L5:nothing"));
+  fx.talk("pip9", "L5", { from: at("L5:says") - 0.05 });
+  tl.to("#s9-lamps", { opacity: 0.85, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 5 }, S.start);
+  const pw = at("L5:paperwork");
+  ["#s9-p1", "#s9-p2", "#s9-p3", "#s9-p4", "#s9-p5", "#s9-p6", "#s9-p7"].forEach((p, i) => {
+    tl.fromTo(p, { opacity: 0, y: -60 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, pw + i * 0.16);
+  });
+  fx.look("pip9", 1, pw + 0.2);
+  fx.pose("pip9", "shrug", at("L5:except") - 0.05);
+  fx.face("pip9", "worried", pw + 0.6);
+  fx.squash("#pip9", pw + 1.1, { amt: 0.1 });
+  fx.cam("#s9-cam", { scale: 1.15 }, S.start, S.end - S.start, "560 1250");
+</script>

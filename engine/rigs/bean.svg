@@ -1,34 +1,117 @@
-<!-- toonshorts rig: "bean" — 2.5D ink-cartoon character (rounded torso, skin head, optional hard hat),
-     feet on y=0, facing +x, ~440 px tall at scale 1. The "Pip" look from the bridge-gaps example.
-     Use in a scene:  <rig type="bean" id="pip" x="480" y="1100" shirt="#2ec4b6" hat="#ffc93c" prop="clipboard" />
-     hat="none" removes the hat; prop="none" removes the clipboard.
-     Parts: {{id}}, {{id}}-body, {{id}}-head, {{id}}-eyes, {{id}}-mouth, {{id}}-mouthO, {{id}}-armL (back), {{id}}-armR (front),
-     {{id}}-legL, {{id}}-legR, {{id}}-hat, {{id}}-prop -->
+<!-- toonshorts rig: "bean" (v2): 2.5D ink-cartoon character. Front-facing, feet on y=0, ~610 px tall at scale 1 (with hat).
+     Outlined limbs (ink under colour), shaded torso and head, hands, brows, pupils, cheeks, 6 mouth shapes.
+     Use:  <rig type="bean" id="pip" x="480" y="1120" scale="1" shirt="#2ec4b6" hat="#ffc93c" prop="clipboard"
+                face="happy" pose="idle" talks="L2,L5" life="on" />
+     hat="none" / prop="none" remove them. face/pose/talks/life are read by the engine (auto acting), not the art.
+     Parts: {{id}} (whole), -body, -torso, -headbob, -head, -eyes, -pupils, -brows, -browL, -browR,
+            -mouth (closed), -mouthO, -mouthA, -mouthU, -mouthE, -mouthF, -armL, -foreL, -armR, -foreR,
+            -legL, -shinL, -legR, -shinR, -hat, -prop.
+     Every joint group carries an invisible pivot circle centred on the joint, so transformOrigin "50% 50%"
+     rotates it about the joint. -->
 <g transform="translate({{x}} {{y}}) scale({{scale}})">
-  <g id="{{id}}" stroke="{{ink}}" stroke-linecap="round" stroke-linejoin="round">
-    <ellipse cx="0" cy="0" rx="70" ry="12" fill="{{ink}}" opacity="0.25" stroke="none" />
+  <g id="{{id}}" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="0" cy="2" rx="96" ry="15" fill="{{ink}}" opacity="0.22" />
     <g id="{{id}}-body">
-      <g id="{{id}}-legL"><line x1="-16" y1="-140" x2="-20" y2="-8" stroke-width="12" stroke="{{limb}}" /><ellipse cx="-26" cy="-6" rx="20" ry="9" fill="{{ink}}" stroke-width="2" /></g>
-      <g id="{{id}}-legR"><line x1="16" y1="-140" x2="20" y2="-8" stroke-width="12" stroke="{{limb}}" /><ellipse cx="26" cy="-6" rx="20" ry="9" fill="{{ink}}" stroke-width="2" /></g>
-      <g id="{{id}}-armL"><line x1="-38" y1="-275" x2="-66" y2="-175" stroke-width="11" stroke="{{limb}}" /></g>
-      <rect x="-46" y="-300" width="92" height="168" rx="34" fill="{{shirt}}" stroke-width="5" />
-      <path d="M-46 -230 h92" stroke-width="4" fill="none" />
-      <g id="{{id}}-armR">
-        <line x1="38" y1="-275" x2="70" y2="-180" stroke-width="11" stroke="{{limb}}" />
-        <g id="{{id}}-prop" data-prop="{{prop}}">
-          <rect x="62" y="-206" width="44" height="56" rx="6" fill="#f3eadb" stroke-width="4" />
-          <path d="M71 -190 h26 M71 -177 h20" stroke-width="3" fill="none" />
+      <g id="{{id}}-legL">
+        <circle cx="-30" cy="-196" r="200" fill="none" stroke="none" />
+        <path d="M-30 -196 L-34 -110" stroke="{{ink}}" stroke-width="40" fill="none" />
+        <path d="M-30 -196 L-34 -110" stroke="{{pants}}" stroke-width="26" fill="none" />
+        <g id="{{id}}-shinL">
+          <circle cx="-34" cy="-110" r="112" fill="none" stroke="none" />
+          <path d="M-34 -110 L-36 -30" stroke="{{ink}}" stroke-width="38" fill="none" />
+          <path d="M-34 -110 L-36 -30" stroke="{{pants}}" stroke-width="24" fill="none" />
+          <path d="M-74 -2 C-78 -40 -50 -46 -30 -44 C-8 -42 2 -26 2 -2 Z" fill="{{shoe}}" stroke="{{ink}}" stroke-width="7" />
+          <path d="M-64 -24 Q-50 -36 -34 -34" stroke="#ffffff" stroke-width="5" fill="none" opacity="0.35" />
         </g>
       </g>
-      <g id="{{id}}-head">
-        <circle cx="0" cy="-362" r="60" fill="{{skin}}" stroke-width="5" />
-        <g id="{{id}}-hat" data-hat="{{hat}}">
-          <path d="M-64 -372 Q-60 -440 0 -442 Q60 -440 64 -372 Z" fill="{{hat}}" stroke-width="5" />
-          <path d="M-80 -372 H80" stroke-width="7" fill="none" />
+      <g id="{{id}}-legR">
+        <circle cx="30" cy="-196" r="200" fill="none" stroke="none" />
+        <path d="M30 -196 L34 -110" stroke="{{ink}}" stroke-width="40" fill="none" />
+        <path d="M30 -196 L34 -110" stroke="{{pants}}" stroke-width="26" fill="none" />
+        <g id="{{id}}-shinR">
+          <circle cx="34" cy="-110" r="112" fill="none" stroke="none" />
+          <path d="M34 -110 L36 -30" stroke="{{ink}}" stroke-width="38" fill="none" />
+          <path d="M34 -110 L36 -30" stroke="{{pants}}" stroke-width="24" fill="none" />
+          <path d="M74 -2 C78 -40 50 -46 30 -44 C8 -42 -2 -26 -2 -2 Z" fill="{{shoe}}" stroke="{{ink}}" stroke-width="7" />
+          <path d="M40 -34 Q56 -36 66 -24" stroke="#ffffff" stroke-width="5" fill="none" opacity="0.35" />
         </g>
-        <g id="{{id}}-eyes" fill="{{ink}}" stroke="none"><circle cx="-18" cy="-350" r="7" /><circle cx="22" cy="-350" r="7" /></g>
-        <path id="{{id}}-mouth" d="M-6 -318 q8 6 16 0" stroke-width="4" fill="none" />
-        <ellipse id="{{id}}-mouthO" cx="2" cy="-316" rx="8" ry="7" fill="{{ink}}" stroke="none" opacity="0" />
+      </g>
+      <g id="{{id}}-torso">
+        <path d="M-72 -330 C-78 -396 78 -396 74 -330 L80 -232 C84 -168 -84 -168 -80 -232 Z" fill="{{shirt}}" stroke="{{ink}}" stroke-width="8" />
+        <path d="M-80 -226 L80 -226 C84 -168 -84 -168 -80 -226 Z" fill="{{pants}}" stroke="{{ink}}" stroke-width="7" />
+        <path d="M-12 -214 h24 v14 h-24 Z" fill="{{hot}}" stroke="{{ink}}" stroke-width="4" />
+        <path d="M34 -380 C70 -366 76 -300 78 -236 C78 -200 66 -186 40 -182 C58 -236 58 -330 34 -380 Z" fill="{{ink}}" opacity="0.16" />
+        <path d="M-58 -350 C-64 -320 -66 -280 -64 -246" stroke="#ffffff" stroke-width="7" fill="none" opacity="0.28" />
+        <path d="M-30 -384 L0 -350 L30 -384" stroke="{{ink}}" stroke-width="6" fill="none" />
+        <path d="M22 -320 h34 v30 h-34 Z" fill="none" stroke="{{ink}}" stroke-width="5" opacity="0.7" />
+        <path d="M30 -336 v22" stroke="#ff5a4a" stroke-width="6" />
+      </g>
+      <g id="{{id}}-armL">
+        <circle cx="-70" cy="-350" r="290" fill="none" stroke="none" />
+        <path d="M-70 -350 L-90 -272" stroke="{{ink}}" stroke-width="36" fill="none" />
+        <path d="M-70 -350 L-90 -272" stroke="{{shirt}}" stroke-width="22" fill="none" />
+        <g id="{{id}}-foreL">
+          <circle cx="-90" cy="-272" r="200" fill="none" stroke="none" />
+          <path d="M-90 -272 L-96 -200" stroke="{{ink}}" stroke-width="30" fill="none" />
+          <path d="M-90 -272 L-96 -200" stroke="{{skin}}" stroke-width="17" fill="none" />
+          <circle cx="-97" cy="-190" r="21" fill="{{skin}}" stroke="{{ink}}" stroke-width="7" />
+        </g>
+      </g>
+      <g id="{{id}}-armR">
+        <circle cx="70" cy="-350" r="290" fill="none" stroke="none" />
+        <path d="M70 -350 L90 -272" stroke="{{ink}}" stroke-width="36" fill="none" />
+        <path d="M70 -350 L90 -272" stroke="{{shirt}}" stroke-width="22" fill="none" />
+        <g id="{{id}}-foreR">
+          <circle cx="90" cy="-272" r="200" fill="none" stroke="none" />
+          <path d="M90 -272 L96 -200" stroke="{{ink}}" stroke-width="30" fill="none" />
+          <path d="M90 -272 L96 -200" stroke="{{skin}}" stroke-width="17" fill="none" />
+          <g id="{{id}}-prop" data-prop="{{prop}}" transform="rotate(-8 130 -210)">
+              <rect x="96" y="-262" width="72" height="94" rx="8" fill="#c98a4b" stroke="{{ink}}" stroke-width="6" />
+              <rect x="106" y="-248" width="52" height="70" rx="3" fill="#fffaf0" stroke="{{ink}}" stroke-width="3" />
+              <path d="M114 -232 h34 M114 -218 h28 M114 -204 h34" stroke="{{ink}}" stroke-width="4" fill="none" />
+              <rect x="118" y="-268" width="28" height="12" rx="4" fill="#9aa3ad" stroke="{{ink}}" stroke-width="4" />
+          </g>
+          <circle cx="97" cy="-190" r="21" fill="{{skin}}" stroke="{{ink}}" stroke-width="7" />
+        </g>
+      </g>
+      <g id="{{id}}-headbob">
+        <g id="{{id}}-head">
+          <circle cx="0" cy="-385" r="240" fill="none" stroke="none" />
+          <circle cx="-92" cy="-456" r="19" fill="{{skin}}" stroke="{{ink}}" stroke-width="6" />
+          <circle cx="92" cy="-456" r="19" fill="{{skin}}" stroke="{{ink}}" stroke-width="6" />
+          <circle cx="0" cy="-462" r="94" fill="{{skin}}" stroke="{{ink}}" stroke-width="8" />
+          <path d="M44 -540 C96 -510 104 -420 58 -380 C82 -430 82 -500 44 -540 Z" fill="{{ink}}" opacity="0.13" />
+          <ellipse cx="-58" cy="-424" rx="17" ry="10" fill="#ff7a7a" opacity="0.45" />
+          <ellipse cx="60" cy="-424" rx="17" ry="10" fill="#ff7a7a" opacity="0.45" />
+          <g id="{{id}}-eyes">
+            <ellipse cx="-34" cy="-464" rx="21" ry="26" fill="#ffffff" stroke="{{ink}}" stroke-width="5" />
+            <ellipse cx="34" cy="-464" rx="21" ry="26" fill="#ffffff" stroke="{{ink}}" stroke-width="5" />
+            <g id="{{id}}-pupils">
+              <circle cx="-30" cy="-459" r="12" fill="{{ink}}" />
+              <circle cx="38" cy="-459" r="12" fill="{{ink}}" />
+              <circle cx="-26" cy="-464" r="4" fill="#ffffff" />
+              <circle cx="42" cy="-464" r="4" fill="#ffffff" />
+            </g>
+          </g>
+          <g id="{{id}}-brows" stroke="{{ink}}" stroke-width="9" fill="none">
+            <path id="{{id}}-browL" d="M-56 -506 Q-36 -518 -14 -508" />
+            <path id="{{id}}-browR" d="M14 -508 Q36 -518 56 -506" />
+          </g>
+          <path d="M2 -440 q11 8 0 16" stroke="{{ink}}" stroke-width="5" fill="none" />
+          <path id="{{id}}-mouth" d="M-22 -410 Q2 -392 26 -410" stroke="{{ink}}" stroke-width="7" fill="none" />
+          <path id="{{id}}-mouthO" d="M-18 -414 Q2 -420 22 -414 Q20 -384 2 -384 Q-16 -384 -18 -414 Z" fill="#6b2230" stroke="{{ink}}" stroke-width="6" opacity="0" />
+          <path id="{{id}}-mouthA" d="M-30 -416 Q2 -424 34 -416 Q30 -370 2 -370 Q-26 -370 -30 -416 Z" fill="#6b2230" stroke="{{ink}}" stroke-width="6" opacity="0" />
+          <ellipse id="{{id}}-mouthU" cx="2" cy="-404" rx="11" ry="13" fill="#6b2230" stroke="{{ink}}" stroke-width="6" opacity="0" />
+          <path id="{{id}}-mouthE" d="M-28 -414 L32 -414 Q28 -388 2 -388 Q-24 -388 -28 -414 Z" fill="#ffffff" stroke="{{ink}}" stroke-width="6" opacity="0" />
+          <path id="{{id}}-mouthF" d="M-20 -404 Q2 -414 24 -404" stroke="{{ink}}" stroke-width="7" fill="none" opacity="0" />
+          <g id="{{id}}-hat" data-hat="{{hat}}">
+            <path d="M-100 -500 C-98 -588 -52 -608 0 -608 C52 -608 98 -588 100 -500 Z" fill="{{hat}}" stroke="{{ink}}" stroke-width="8" />
+            <path d="M-16 -604 Q0 -612 16 -604 L16 -504 L-16 -504 Z" fill="#ffffff" opacity="0.3" />
+            <path d="M-120 -500 H120" stroke="{{ink}}" stroke-width="20" />
+            <path d="M-114 -500 H114" stroke="{{hat}}" stroke-width="8" />
+            <path d="M-70 -580 Q-82 -548 -84 -516" stroke="#ffffff" stroke-width="7" fill="none" opacity="0.45" />
+          </g>
+        </g>
       </g>
     </g>
   </g>

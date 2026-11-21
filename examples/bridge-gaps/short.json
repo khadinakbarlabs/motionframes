@@ -9,61 +9,94 @@
   "lines": [
     {
       "id": "L1",
-      "text": "Engineers leave gaps in every bridge, on purpose."
+      "text": "Engineers leave gaps in every bridge, on purpose.",
+      "audio": "assets/vo-L1.mp3"
     },
     {
       "id": "L2",
-      "text": "Pip, a brand new bridge inspector, found one on his very first day. A gap right across the road, wide enough to swallow a phone. So he did what any good inspector would do. He filled it."
+      "text": "Pip, a brand new bridge inspector, found one on his very first day. A gap right across the road, wide enough to swallow a phone. So he did what any good inspector would do. He filled it.",
+      "audio": "assets/vo-L2.mp3"
     },
     {
       "id": "L3",
-      "text": "You see, steel grows when it gets hot. Not a lot. About 1 millimeter for every 10 meters, every 8 degrees. Sounds tiny. But a 100 meter bridge, from a winter night to a summer afternoon, can grow 5 centimeters longer. With no gap, that steel has nowhere to go. So it pushes. Railway tracks can buckle like this on hot days."
+      "text": "You see, steel grows when it gets hot. Not a lot. About 1 millimeter for every 10 meters, every 8 degrees. Sounds tiny. But a 100 meter bridge, from a winter night to a summer afternoon, can grow 5 centimeters longer. With no gap, that steel has nowhere to go. So it pushes. Railway tracks can buckle like this on hot days.",
+      "audio": "assets/vo-L3.mp3"
     },
     {
       "id": "L4",
-      "text": "That's why bridges get expansion joints. Steel teeth that slide past each other. Open in winter, closed in summer. The bridge breathes."
+      "text": "That's why bridges get expansion joints. Steel teeth that slide past each other. Open in winter, closed in summer. The bridge breathes.",
+      "audio": "assets/vo-L4.mp3"
     },
     {
       "id": "L5",
-      "text": "Pip's bridge did not breathe. By July, the road had a bump. Pip now inspects tunnels. He says nothing ever grows down there, except his paperwork."
+      "text": "Pip's gridge did not breathe. By July, the road had a bump. Pip now inspects tunnels. He says nothing ever grows down there, except his paperwork.",
+      "audio": "assets/vo-L5.mp3"
     }
   ],
   "scenes": [
     {
       "id": "s1",
       "at": "0",
-      "file": "s1-gap.html"
+      "file": "s1-gap.html",
+      "cam": "still"
     },
     {
       "id": "s2",
       "at": "L2-0.1",
-      "file": "s2-pip.html"
+      "file": "s2-pip.html",
+      "in": "whip",
+      "cam": "still"
     },
     {
       "id": "s3",
-      "at": "L3:steel-0.3",
-      "file": "s3-steel.html"
+      "at": "L2:found-0.15",
+      "file": "s3-found.html",
+      "in": "push",
+      "cam": "still"
     },
     {
       "id": "s4",
-      "at": "L3:With-0.2",
-      "file": "s4-push.html"
+      "at": "L2:So-0.15",
+      "file": "s4-fill.html",
+      "in": "whip-right",
+      "cam": "still"
     },
     {
       "id": "s5",
-      "at": "L4-0.1",
-      "file": "s5-joint.html",
-      "cut": "fade"
+      "at": "L3-0.15",
+      "file": "s5-steel.html",
+      "in": "iris",
+      "irisAt": "540 1000",
+      "cam": "push"
     },
     {
       "id": "s6",
-      "at": "L5-0.1",
-      "file": "s6-bump.html"
+      "at": "L3:With-0.2",
+      "file": "s6-push.html",
+      "in": "push",
+      "cam": "push"
     },
     {
       "id": "s7",
+      "at": "L4-0.1",
+      "file": "s7-joint.html",
+      "in": "whip",
+      "cam": "rise"
+    },
+    {
+      "id": "s8",
+      "at": "L5-0.1",
+      "file": "s8-bump.html",
+      "in": "whip-right",
+      "cam": "push"
+    },
+    {
+      "id": "s9",
       "at": "L5:Pip#2-0.2",
-      "file": "s7-tunnel.html"
+      "file": "s9-tunnel.html",
+      "in": "iris",
+      "irisAt": "540 1250",
+      "cam": "still"
     }
   ],
   "captions": {
@@ -85,13 +118,13 @@
   },
   "cues": [
     {
-      "at": "L2+0.2",
+      "at": "s2+0.05",
       "sfx": [
         "footstep",
         "gravel step"
       ],
-      "every": 0.36,
-      "count": 8,
+      "every": 0.34,
+      "count": 5,
       "vol": 0.3
     },
     {
@@ -152,7 +185,7 @@
     {
       "sfx": "river",
       "from": "0",
-      "to": "s3",
+      "to": "s5",
       "vol": 0.08
     }
   ],
@@ -160,6 +193,5 @@
     "cutWhoosh": true,
     "captionPops": "hot",
     "riser": "L3:buckle"
-  },
-  "voice": "am_michael"
+  }
 }

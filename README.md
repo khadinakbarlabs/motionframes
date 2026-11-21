@@ -16,15 +16,22 @@ The best ideas from five open-source animation projects, merged into one free pi
 
 ## What is automatic
 
-- Voice lines are measured and laid end to end (0.3 s gaps, no dead air).
-- Word timings from local whisper. Scenes, actions and sounds anchor to **words**: `"at": "L3:pushes-0.2"`.
-- 1-2 word punch captions with hot-word colour and pop-in, kept clear of the action and the platform buttons.
-- Sound design by plain words (`"sfx": "metal clank"`): free CC0/CC BY sounds, measured, placed so the hit
-  lands one frame after the picture. Cut whooshes, caption pops, risers and ambience beds. Credits file
-  written for you. Non-commercial licences blocked.
-- Character rigs (`stick`, `bean`) with walk, talk, blink, breathe, look, squash, plus a smootherstep camera,
-  per-scene creep (no frozen frames) and impact kicks.
-- QA: black frames, frozen picture, dead air, loudness (-14 LUFS) and true peak.
+- Voice lines are measured and laid end to end (0.3 s gaps, no dead air). Word timings from local whisper.
+  Scenes, actions and sounds anchor to **words**: `"at": "L3:pushes-0.2"`.
+- **Characters that act**: the `bean` rig (2.5D ink cartoon) has outlined limbs with knees and elbows, hands,
+  shading, brows, pupils and 6 mouth shapes. Faces (`happy`, `shocked`, `worried`, ...), poses (`point`,
+  `shrug`, `cheer`, ...), vowel-shaped lip sync, knee-bend walks, hops. Every rig breathes, blinks and moves
+  its head on its own.
+- **Worlds in one tag**: `<backdrop preset="sunset" ground="water" />` builds sky, sun glow, drifting clouds,
+  hazy far hills, near hills and rippling water as depth layers.
+- **Camera and cuts**: each scene gets an eased camera move with parallax; scenes change with whip (motion
+  blur), push-through, iris or fade, and the whoosh follows the move.
+- **Captions** grouped by meaning (never ending on "in", "his", "the"), hot words punched in on their own.
+- **Sound** by plain words (`"sfx": "metal clank"`): free CC0/CC BY sounds, a shared local library so a sound
+  is only searched once, hits placed one frame after the picture, ducking under the voice, credits written
+  for you. Non-commercial licences blocked. Missing sounds are reported, not fatal.
+- **One command**: `toonshorts go` runs voice, words, sounds, build, check, preview stills, mix, render,
+  -14 LUFS and QA (black frames, frozen picture, dead air, loudness, true peak) with a timing per step.
 
 ## Install
 
@@ -49,34 +56,29 @@ Then ask Claude: *"Make an animated short about why bridges have gaps."*
 ## Use it by hand
 
 ```bash
-node engine/toonshorts.mjs init my-short --rig bean
+node engine/toonshorts.mjs init my-short
 ```
 
-Edit `my-short/short.json` and `my-short/scenes/*.html`, then:
+Edit `my-short/short.json` and `my-short/scenes/*.html`, then preview (about 30 s):
 
 ```bash
-node engine/toonshorts.mjs make my-short
+node engine/toonshorts.mjs go my-short --no-render
 ```
 
-```bash
-node engine/toonshorts.mjs stills my-short --at 1,8,20
-```
+Look at `my-short/snaps/preview/sheet.jpg`, then render the checked mp4 (about 2 minutes for 60 s):
 
 ```bash
-node engine/toonshorts.mjs render my-short
+node engine/toonshorts.mjs go my-short
 ```
 
 | command | does |
 |---|---|
+| `go <dir> [--no-render] [--draft]` | everything, with progress and a time per step |
+| `preview <dir>` | build + one still per scene -> `snaps/preview/sheet.jpg` |
+| `doctor .` | check node, ffmpeg, HyperFrames, voice and sound library |
 | `setup .` | one-time install of the free local voice |
 | `init <dir>` | scaffold `short.json` + `scenes/` |
-| `voice <dir>` | free local voice (Kokoro) for lines with no audio |
-| `words <dir>` | word timings (local whisper) |
-| `sfx <dir>` | find, measure and lock every sound |
-| `build <dir>` | write `index.html` (a HyperFrames composition you can open in HyperFrames Studio) |
-| `check <dir>` / `stills <dir>` / `mix <dir>` | lint / snapshots / audio-only preview |
-| `render <dir>` | render, normalise to -14 LUFS, QA report |
-| `make <dir>` | voice + words + sfx + build + check + mix |
+| `voice` / `words` / `sfx` / `build` / `check` / `stills` / `mix` / `render` / `qa` | single steps |
 
 A full example lives in [`examples/bridge-gaps`](examples/bridge-gaps): 7 scenes, 64 s, 36 sound clips.
 

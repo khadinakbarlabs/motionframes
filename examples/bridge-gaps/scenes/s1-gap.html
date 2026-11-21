@@ -1,35 +1,22 @@
-<!-- s1 hook: a real-looking bridge at sunset with a clear gap; camera pushes into the gap -->
-<defs>
-  <linearGradient id="s1-skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7e4a" /><stop offset="0.7" stop-color="#ffb46e" /><stop offset="1" stop-color="#ffd08a" /></linearGradient>
-  <linearGradient id="s1-waterg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f9db0" /><stop offset="1" stop-color="#17596a" /></linearGradient>
-</defs>
-<rect width="1080" height="1920" fill="url(#s1-skyg)" />
-<circle cx="850" cy="900" r="160" fill="#fff1b8" opacity="0.25" />
-<circle id="s1-sun" cx="850" cy="900" r="100" fill="#ffe8a3" />
-<g id="s1-clouds" fill="#fff4e0" opacity="0.85">
-  <path d="M80 820 a46 46 0 0 1 86 -18 a38 38 0 0 1 70 18 Z" />
-  <path d="M560 760 a36 36 0 0 1 66 -14 a30 30 0 0 1 56 14 Z" />
+<!-- s1 hook: close on a real bridge gap at sunset, camera pushes into it -->
+<backdrop preset="sunset" horizon="1330" ground="water" sun="790 860" seed="4" />
+<g id="s1-deck" stroke="#0f1220" stroke-width="9" stroke-linejoin="round">
+  <rect x="150" y="1350" width="130" height="520" fill="#c79a74" /><rect x="800" y="1350" width="130" height="520" fill="#c79a74" />
+  <path d="M150 1400 h130 M800 1400 h130" stroke-width="5" opacity="0.5" />
+  <rect x="-60" y="1260" width="560" height="100" fill="#f3dcb4" /><rect x="580" y="1260" width="560" height="100" fill="#f3dcb4" />
+  <rect x="-60" y="1322" width="560" height="38" fill="#d6b07e" stroke="none" /><rect x="580" y="1322" width="560" height="38" fill="#d6b07e" stroke="none" />
+  <path d="M-60 1322 H500 M580 1322 H1140" stroke-width="5" />
+  <path d="M-60 1190 H500 M580 1190 H1140" stroke-width="12" />
+  <path d="M-20 1190 v70 M60 1190 v70 M140 1190 v70 M220 1190 v70 M300 1190 v70 M380 1190 v70 M460 1190 v70 M620 1190 v70 M700 1190 v70 M780 1190 v70 M860 1190 v70 M940 1190 v70 M1020 1190 v70 M1100 1190 v70" stroke-width="8" />
 </g>
-<path d="M0 1190 Q170 1050 380 1160 Q600 1020 820 1150 Q960 1090 1080 1140 V1320 H0 Z" fill="#d9683f" opacity="0.55" />
-<rect y="1300" width="1080" height="620" fill="url(#s1-waterg)" />
-<g stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.35" fill="none">
-  <path id="s1-rip1" d="M90 1480 h120 M420 1560 h90 M760 1470 h140 M240 1700 h110 M640 1760 h130 M880 1640 h80" />
-</g>
-<g stroke="#0f1220" stroke-width="8" stroke-linejoin="round">
-  <rect x="120" y="1200" width="120" height="260" fill="#c79a74" />
-  <rect x="840" y="1200" width="120" height="260" fill="#c79a74" />
-  <path d="M120 1240 h120 M840 1240 h120" stroke-width="5" />
-  <rect x="-20" y="1120" width="525" height="84" fill="#f3dcb4" />
-  <rect x="575" y="1120" width="525" height="84" fill="#f3dcb4" />
-  <path d="M-20 1060 H505 M575 1060 H1100" stroke-width="10" />
-  <path d="M30 1060 v60 M110 1060 v60 M190 1060 v60 M270 1060 v60 M350 1060 v60 M430 1060 v60 M640 1060 v60 M720 1060 v60 M800 1060 v60 M880 1060 v60 M960 1060 v60 M1040 1060 v60" stroke-width="7" />
-</g>
-<path d="M20 1162 h60 M140 1162 h60 M260 1162 h60 M380 1162 h60 M620 1162 h60 M740 1162 h60 M860 1162 h60 M980 1162 h60" stroke="#ffffff" stroke-width="8" stroke-linecap="round" />
-<path id="s1-arrow" d="M540 880 v140 m-44 -44 l44 44 l44 -44" stroke="#0f1220" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+<path d="M10 1290 h70 M150 1290 h70 M290 1290 h70 M650 1290 h70 M790 1290 h70 M930 1290 h70" stroke="#ffffff" stroke-width="9" stroke-linecap="round" />
+<path id="s1-glint" d="M540 1215 l12 -34 l12 34 l34 12 l-34 12 l-12 34 l-12 -34 l-34 -12 Z" fill="#fff6c8" stroke="#0f1220" stroke-width="5" opacity="0" />
+<path id="s1-arrow" d="M540 900 v170 m-56 -56 l56 56 l56 -56" stroke="#0f1220" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
 <script>
-  fx.drift("#s1-clouds", -20, 40, S.start, S.end);
-  fx.boil("#s1-rip1", S.start, S.end, { px: 3 });
-  fx.cam("#s1-cam", { scale: 1.45 }, 0.2, at("L1.end") - 0.4, "540 1160");
-  fx.pop("#s1-arrow", at("L1:gaps"));
-  tl.to("#s1-arrow", { y: 18, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 3 }, at("L1:gaps") + 0.35);
+  fx.camSet("#s1-cam", { scale: 1.15 }, 0, "540 1240");
+  fx.cam("#s1-cam", { scale: 1.5 }, 0.1, at("L1.end") - 0.2, "540 1240");
+  fx.pop("#s1-arrow", at("L1:gaps") - 0.05);
+  tl.to("#s1-arrow", { y: 22, duration: 0.28, ease: "sine.inOut", yoyo: true, repeat: 3 }, at("L1:gaps") + 0.3);
+  fx.pop("#s1-glint", at("L1:purpose") - 0.05, { from: 0.2 });
+  tl.to("#s1-glint", { rotation: 90, svgOrigin: "552 1227", duration: 0.6, ease: "power2.out" }, at("L1:purpose"));
 </script>
