@@ -1,13 +1,52 @@
-<!-- s4: nowhere to go -> it pushes -> rails buckle -->
-<rect width="1080" height="1920" fill="#ffd27a" />
-<rect y="1300" width="1080" height="620" fill="#c79a74" />
-<path id="s4-rail" d="M0 1200 L1080 1200" stroke="#0f1220" stroke-width="26" fill="none" />
-<path d="M0 1260 L1080 1260" stroke="#0f1220" stroke-width="26" fill="none" />
-<rect x="0" y="1100" width="60" height="220" fill="#6c4fb5" stroke="#0f1220" stroke-width="8" />
-<rect x="1020" y="1100" width="60" height="220" fill="#6c4fb5" stroke="#0f1220" stroke-width="8" />
+<!-- s4: no gap -> steel jammed between two blocks pushes and cracks them; below, railway tracks buckle sideways -->
+<defs>
+  <linearGradient id="s4-skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc56a" /><stop offset="1" stop-color="#ffe3a0" /></linearGradient>
+  <pattern id="s4-gravel" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#b7a38c" /><circle cx="8" cy="10" r="5" fill="#9c8670" /><circle cx="28" cy="26" r="6" fill="#a8927a" /><circle cx="30" cy="6" r="3" fill="#8d7862" /></pattern>
+  <linearGradient id="s4-beamg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a6a" /><stop offset="1" stop-color="#e0603a" /></linearGradient>
+</defs>
+<rect width="1080" height="1920" fill="url(#s4-skyg)" />
+<g id="s4-heat" stroke="#ffffff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.5">
+  <path d="M260 680 q20 -30 0 -60 q-20 -30 0 -60 M540 690 q20 -30 0 -60 q-20 -30 0 -60 M820 680 q20 -30 0 -60 q-20 -30 0 -60" />
+</g>
+<!-- top: steel with nowhere to go -->
+<g id="s4-top">
+  <rect x="0" y="700" width="150" height="260" fill="#9aa3ad" stroke="#0f1220" stroke-width="8" />
+  <rect x="930" y="700" width="150" height="260" fill="#9aa3ad" stroke="#0f1220" stroke-width="8" />
+  <path id="s4-crackL" d="M150 740 l-40 40 l26 30 l-50 46" stroke="#0f1220" stroke-width="7" fill="none" opacity="0" />
+  <path id="s4-crackR" d="M930 760 l40 34 l-24 36 l48 40" stroke="#0f1220" stroke-width="7" fill="none" opacity="0" />
+  <path id="s4-beam" d="M150 790 L930 790 L930 870 L150 870 Z" fill="url(#s4-beamg)" stroke="#0f1220" stroke-width="8" stroke-linejoin="round" />
+  <g id="s4-push" stroke="#0f1220" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0">
+    <path d="M320 830 h-110 m30 -30 l-30 30 l30 30" />
+    <path d="M760 830 h110 m-30 -30 l30 30 l-30 30" />
+  </g>
+</g>
+<!-- bottom: railway, seen from above -->
+<rect y="1060" width="1080" height="860" fill="#8cc46a" />
+<path d="M0 1120 Q300 1100 520 1130 T1080 1110 V1060 H0 Z" fill="#79b058" />
+<rect y="1280" width="1080" height="420" fill="url(#s4-gravel)" stroke="#0f1220" stroke-width="6" />
+<g fill="#7a5a3c" stroke="#0f1220" stroke-width="5">
+  <rect x="30" y="1320" width="50" height="340" rx="6" /><rect x="150" y="1320" width="50" height="340" rx="6" /><rect x="270" y="1320" width="50" height="340" rx="6" />
+  <rect x="390" y="1320" width="50" height="340" rx="6" /><rect x="510" y="1320" width="50" height="340" rx="6" /><rect x="630" y="1320" width="50" height="340" rx="6" />
+  <rect x="750" y="1320" width="50" height="340" rx="6" /><rect x="870" y="1320" width="50" height="340" rx="6" /><rect x="990" y="1320" width="50" height="340" rx="6" />
+</g>
+<path id="s4-rail" d="M0 1400 C360 1400 720 1400 1080 1400" stroke="#3b4252" stroke-width="28" fill="none" />
+<path id="s4-rail2" d="M0 1580 C360 1580 720 1580 1080 1580" stroke="#3b4252" stroke-width="28" fill="none" />
+<path id="s4-railhi" d="M0 1394 C360 1394 720 1394 1080 1394" stroke="#c9d1dc" stroke-width="6" fill="none" />
+<path id="s4-railhi2" d="M0 1574 C360 1574 720 1574 1080 1574" stroke="#c9d1dc" stroke-width="6" fill="none" />
 <script>
-  fx.boil("#s4-rail", at("L3:pushes") - 0.4, at("L3:buckle"), { px: 2.5 });
-  tl.to("#s4-rail", { attr: { d: "M0 1200 Q540 900 1080 1200" }, duration: 0.45, ease: "back.out(2)" }, at("L3:buckle"));
+  fx.boil("#s4-heat", S.start, S.end, { px: 4 });
+  tl.fromTo("#s4-heat", { y: 0 }, { y: -20, duration: S.end - S.start, ease: "none" }, S.start);
+  fx.pop("#s4-push", at("L3:pushes") - 0.1);
+  tl.to("#s4-beam", { attr: { d: "M150 790 Q540 740 930 790 L930 870 Q540 820 150 870 Z" }, duration: 0.5, ease: "back.out(2)" }, at("L3:pushes"));
+  fx.show("#s4-crackL", at("L3:pushes") + 0.25);
+  fx.show("#s4-crackR", at("L3:pushes") + 0.3);
+  fx.kick("#s4-top", at("L3:pushes") + 0.25, 10);
+  fx.boil("#s4-rail", at("L3:Railway"), at("L3:buckle"), { px: 2.5 });
+  const kink = (y) => `M0 ${y} C360 ${y} 380 ${y - 150} 540 ${y - 150} S720 ${y} 1080 ${y}`;
+  tl.to("#s4-rail", { attr: { d: kink(1400) }, duration: 0.45, ease: "back.out(2)" }, at("L3:buckle"));
+  tl.to("#s4-rail2", { attr: { d: kink(1580) }, duration: 0.45, ease: "back.out(2)" }, at("L3:buckle"));
+  tl.to("#s4-railhi", { attr: { d: kink(1394) }, duration: 0.45, ease: "back.out(2)" }, at("L3:buckle"));
+  tl.to("#s4-railhi2", { attr: { d: kink(1574) }, duration: 0.45, ease: "back.out(2)" }, at("L3:buckle"));
   fx.kick("#s4", at("L3:buckle"), 18);
-  fx.cam("#s4-cam", { scale: 1.2 }, at("L3:pushes"), 1.2, "540 1200");
+  fx.cam("#s4-cam", { scale: 1.25 }, at("L3:Railway"), 1.0, "540 1490");
 </script>

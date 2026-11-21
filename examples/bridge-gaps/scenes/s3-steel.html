@@ -1,15 +1,82 @@
-<!-- s3: steel grows when hot: a bar stretches against a ruler, sun heats it -->
-<rect width="1080" height="1920" fill="#fff1d6" />
-<circle id="s3-sun" cx="540" cy="520" r="130" fill="#ffc93c" stroke="#0f1220" stroke-width="8" />
-<g id="s3-ruler"><rect x="140" y="1180" width="800" height="60" fill="#f3eadb" stroke="#0f1220" stroke-width="6" />
-  <path d="M180 1180 v30 M260 1180 v20 M340 1180 v30 M420 1180 v20 M500 1180 v30 M580 1180 v20 M660 1180 v30 M740 1180 v20 M820 1180 v30 M900 1180 v20" stroke="#0f1220" stroke-width="5" /></g>
-<rect id="s3-bar" x="180" y="1040" width="600" height="110" rx="10" fill="#9fb3d6" stroke="#0f1220" stroke-width="8" />
-<text id="s3-mm" x="540" y="1420" text-anchor="middle" font-family="Archivo Black" font-size="90" fill="#0f1220" opacity="0">+5 CM</text>
+<!-- s3: steel grows when hot. Sun + thermometer heat a steel beam on a measuring ruler; numbers land on screen, all above the platform button zone -->
+<defs>
+  <pattern id="s3-gridp" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0 H0 V60" fill="none" stroke="#e8d8b8" stroke-width="3" /></pattern>
+  <linearGradient id="s3-beamg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3d0e8" /><stop offset="1" stop-color="#8396bd" /></linearGradient>
+</defs>
+<rect width="1080" height="1920" fill="#fff3dc" />
+<rect width="1080" height="1920" fill="url(#s3-gridp)" />
+<g id="s3-sunwrap">
+  <g id="s3-rays" stroke="#ffb020" stroke-width="11" stroke-linecap="round">
+    <path d="M230 600 v-34 M230 840 v34 M110 720 h-34 M350 720 h34 M145 635 l-24 -24 M315 805 l24 24 M145 805 l-24 24 M315 635 l24 -24" />
+  </g>
+  <circle cx="230" cy="720" r="92" fill="#ffc93c" stroke="#0f1220" stroke-width="8" />
+  <path d="M200 732 q30 26 60 0" stroke="#0f1220" stroke-width="7" fill="none" stroke-linecap="round" />
+  <circle cx="200" cy="700" r="8" fill="#0f1220" /><circle cx="260" cy="700" r="8" fill="#0f1220" />
+</g>
+<g id="s3-thermo" stroke="#0f1220" stroke-width="8">
+  <rect x="860" y="590" width="64" height="240" rx="32" fill="#ffffff" />
+  <circle cx="892" cy="850" r="50" fill="#ff5a4a" />
+  <rect id="s3-merc" x="876" y="625" width="32" height="215" rx="16" fill="#ff5a4a" stroke="none" />
+  <path d="M924 640 h20 M924 690 h20 M924 740 h20 M924 790 h20" stroke-width="5" />
+</g>
+<rect id="s3-glow" x="150" y="925" width="620" height="130" rx="20" fill="#ff7a52" opacity="0" />
+<g id="s3-bar">
+  <rect id="s3-bar-body" x="160" y="935" width="600" height="110" rx="8" fill="url(#s3-beamg)" stroke="#0f1220" stroke-width="8" />
+  <path d="M160 962 H760 M160 1018 H760" stroke="#0f1220" stroke-width="5" opacity="0.6" />
+  <g fill="#0f1220"><circle cx="200" cy="990" r="7" /><circle cx="720" cy="990" r="7" /></g>
+</g>
+<g id="s3-ruler">
+  <rect x="140" y="1070" width="820" height="76" fill="#f3eadb" stroke="#0f1220" stroke-width="6" />
+  <path d="M160 1070 v30 M240 1070 v18 M320 1070 v30 M400 1070 v18 M480 1070 v30 M560 1070 v18 M640 1070 v30 M720 1070 v18 M800 1070 v30 M880 1070 v18 M940 1070 v30" stroke="#0f1220" stroke-width="5" />
+  <text x="172" y="1134" font-family="Archivo Black" font-size="30" fill="#0f1220">0</text>
+  <text x="690" y="1134" font-family="Archivo Black" font-size="30" fill="#0f1220" text-anchor="middle">10 M</text>
+</g>
+<g id="s3-tag1" opacity="0">
+  <rect x="395" y="672" width="440" height="96" rx="48" fill="#0f1220" />
+  <text x="615" y="736" text-anchor="middle" font-family="Archivo Black" font-size="46" fill="#ffc93c">+1 MM / 8°C</text>
+</g>
+<g id="s3-seasons">
+  <g id="s3-winter" opacity="0">
+    <rect x="390" y="672" width="196" height="96" rx="20" fill="#8fc7ff" stroke="#0f1220" stroke-width="6" />
+    <text x="488" y="734" text-anchor="middle" font-family="Archivo Black" font-size="36" fill="#0f1220">WINTER</text>
+  </g>
+  <path id="s3-arrow2" d="M596 720 h30 m-18 -18 l18 18 l-18 18" stroke="#0f1220" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+  <g id="s3-summer" opacity="0">
+    <rect x="640" y="672" width="206" height="96" rx="20" fill="#ff9a5c" stroke="#0f1220" stroke-width="6" />
+    <text x="743" y="734" text-anchor="middle" font-family="Archivo Black" font-size="36" fill="#0f1220">SUMMER</text>
+  </g>
+</g>
+<g id="s3-mm" opacity="0">
+  <text x="600" y="765" text-anchor="middle" font-family="Archivo Black" font-size="112" fill="#ff5a4a" stroke="#0f1220" stroke-width="10" paint-order="stroke">+5 CM</text>
+</g>
+<g id="s3-mini" opacity="0">
+  <path d="M60 1560 H1020" stroke="#2a8fa0" stroke-width="40" stroke-linecap="round" opacity="0.5" />
+  <g id="s3-minibr" stroke="#0f1220" stroke-width="6" stroke-linejoin="round">
+    <rect x="160" y="1440" width="700" height="44" fill="#f3dcb4" />
+    <rect x="220" y="1484" width="40" height="76" fill="#c79a74" /><rect x="490" y="1484" width="40" height="76" fill="#c79a74" /><rect x="760" y="1484" width="40" height="76" fill="#c79a74" />
+  </g>
+  <path id="s3-miniarr" d="M860 1410 h70 m-24 -24 l24 24 l-24 24" stroke="#ff5a4a" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+</g>
 <script>
-  fx.pop("#s3-sun", S.start + 0.1);
-  tl.to("#s3-bar", { fill: "#ff7a52", duration: 1.2, ease: "power1.inOut" }, at("L3:hot") - 0.2);
-  fx.grow("#s3-bar", at("L3:grows"), 0.8, { axis: "X", origin: "0% 50%", from: 1, to: 1.06 });
+  fx.pop("#s3-sunwrap", S.start + 0.1);
+  tl.to("#s3-rays", { rotation: 30, svgOrigin: "230 720", duration: S.end - S.start, ease: "none" }, S.start);
+  tl.fromTo("#s3-merc", { scaleY: 0.25, svgOrigin: "892 840" }, { scaleY: 1, duration: 1.2, ease: "power2.inOut" }, at("L3:hot") - 0.3);
+  tl.to("#s3-glow", { opacity: 0.45, duration: 1.0, ease: "power1.inOut" }, at("L3:hot") - 0.2);
+  tl.to("#s3-bar-body", { fill: "#ff8a5c", duration: 1.2, ease: "power1.inOut" }, at("L3:hot") - 0.2);
+  fx.grow("#s3-bar", at("L3:grow"), 0.8, { axis: "X", origin: "0% 50%", from: 1, to: 1.06 });
+  fx.grow("#s3-glow", at("L3:grow"), 0.8, { axis: "X", origin: "0% 50%", from: 1, to: 1.06 });
+  fx.pop("#s3-tag1", at("L3:About"));
+  fx.out("#s3-tag1", at("L3:But"));
+  fx.pop("#s3-winter", at("L3:winter"));
+  fx.pop("#s3-arrow2", at("L3:summer") - 0.15);
+  fx.pop("#s3-summer", at("L3:summer"));
+  fx.out("#s3-seasons", at("L3:can"));
   fx.grow("#s3-bar", at("L3:5"), 1.0, { axis: "X", origin: "0% 50%", from: 1.06, to: 1.25 });
-  fx.pop("#s3-mm", at("L3:5"));
-  fx.cam("#s3-cam", { scale: 1.12 }, at("L3:tiny"), 0.8, "780 1100");
+  fx.grow("#s3-glow", at("L3:5"), 1.0, { axis: "X", origin: "0% 50%", from: 1.06, to: 1.25 });
+  fx.pop("#s3-mm", at("L3:5"), { from: 0.3 });
+  fx.pop("#s3-mini", at("L3:100") - 0.1);
+  fx.grow("#s3-minibr", at("L3:grow#2"), 0.9, { axis: "X", origin: "0% 50%", from: 1, to: 1.1 });
+  tl.to("#s3-miniarr", { x: 70, duration: 0.9, ease: "power2.inOut" }, at("L3:grow#2"));
+  fx.pop("#s3-miniarr", at("L3:grow#2"));
+  fx.cam("#s3-cam", { scale: 1.08 }, at("L3:tiny"), 0.8, "560 1000");
 </script>

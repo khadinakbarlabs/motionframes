@@ -1,20 +1,52 @@
-<!-- s2: Pip walks in, finds the gap, a phone falls in, he fills it -->
-<rect width="1080" height="1920" fill="#ffb066" />
-<rect y="1350" width="1080" height="570" fill="#2a8fa0" />
-<rect x="0" y="1080" width="600" height="70" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
-<rect x="650" y="1080" width="430" height="70" fill="#f3dcb4" stroke="#0f1220" stroke-width="8" />
-<rect id="s2-fill" x="600" y="1080" width="50" height="70" fill="#6b5b4a" stroke="#0f1220" stroke-width="6" opacity="0" />
-<rect id="s2-phone" x="602" y="960" width="46" height="80" rx="8" fill="#0f1220" opacity="0" />
-<rig type="bean" id="pip" x="0" y="1080" scale="0.9" shirt="#2ec4b6" />
+<!-- s2: Pip walks onto the same bridge, finds the gap, a phone drops through and splashes, he fills it -->
+<defs>
+  <linearGradient id="s2-skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a52" /><stop offset="0.7" stop-color="#ffbc78" /><stop offset="1" stop-color="#ffd494" /></linearGradient>
+  <linearGradient id="s2-waterg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f9db0" /><stop offset="1" stop-color="#17596a" /></linearGradient>
+</defs>
+<rect width="1080" height="1920" fill="url(#s2-skyg)" />
+<circle cx="880" cy="740" r="100" fill="#ffe8a3" />
+<g id="s2-clouds" fill="#fff4e0" opacity="0.85">
+  <path d="M120 680 a46 46 0 0 1 86 -18 a38 38 0 0 1 70 18 Z" />
+  <path d="M600 600 a36 36 0 0 1 66 -14 a30 30 0 0 1 56 14 Z" />
+</g>
+<path d="M0 1190 Q170 1050 380 1160 Q600 1020 820 1150 Q960 1090 1080 1140 V1320 H0 Z" fill="#d9683f" opacity="0.55" />
+<rect y="1300" width="1080" height="620" fill="url(#s2-waterg)" />
+<path id="s2-rip" d="M90 1480 h120 M420 1600 h90 M760 1470 h140 M240 1720 h110 M700 1780 h130" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.35" fill="none" />
+<g stroke="#0f1220" stroke-width="8" stroke-linejoin="round">
+  <rect x="120" y="1200" width="120" height="260" fill="#c79a74" />
+  <rect x="840" y="1200" width="120" height="260" fill="#c79a74" />
+  <rect x="-20" y="1120" width="525" height="84" fill="#f3dcb4" />
+  <rect x="575" y="1120" width="525" height="84" fill="#f3dcb4" />
+  <path d="M-20 1060 H505 M575 1060 H1100" stroke-width="10" />
+  <path d="M30 1060 v60 M110 1060 v60 M190 1060 v60 M270 1060 v60 M350 1060 v60 M430 1060 v60 M640 1060 v60 M720 1060 v60 M800 1060 v60 M880 1060 v60 M960 1060 v60 M1040 1060 v60" stroke-width="7" />
+</g>
+<path d="M20 1162 h60 M140 1162 h60 M260 1162 h60 M380 1162 h60 M620 1162 h60 M740 1162 h60 M860 1162 h60 M980 1162 h60" stroke="#ffffff" stroke-width="8" stroke-linecap="round" />
+<g id="s2-fill" opacity="0">
+  <rect x="505" y="1120" width="70" height="84" fill="#7a6552" stroke="#0f1220" stroke-width="6" />
+  <path d="M515 1140 l12 8 M548 1170 l14 -6 M520 1186 l10 -4" stroke="#0f1220" stroke-width="4" stroke-linecap="round" />
+</g>
+<g id="s2-phone" opacity="0">
+  <rect x="514" y="1000" width="52" height="92" rx="10" fill="#0f1220" />
+  <rect x="521" y="1010" width="38" height="66" rx="4" fill="#7fd3ff" />
+</g>
+<ellipse id="s2-splash" cx="540" cy="1320" rx="90" ry="18" fill="none" stroke="#ffffff" stroke-width="8" opacity="0" />
+<g id="s2-drops" fill="#ffffff" opacity="0"><circle cx="500" cy="1270" r="10" /><circle cx="540" cy="1245" r="12" /><circle cx="585" cy="1268" r="9" /></g>
+<rig type="bean" id="pip" x="0" y="1120" scale="1" shirt="#2ec4b6" />
 <script>
   const walkEnd = at("L2:found");
-  fx.walk("pip", S.start + 0.2, walkEnd, -160, 470);
+  fx.drift("#s2-clouds", -10, 50, S.start, S.end);
+  fx.boil("#s2-rip", S.start, S.end, { px: 3 });
+  fx.walk("pip", S.start + 0.2, walkEnd, -160, 400);
   fx.talk("pip", "L2");
   fx.blinks("#pip-eyes", walkEnd, S.end, 5);
   fx.look("pip", 1, at("L2:gap"));
-  tl.set("#s2-phone", { opacity: 1 }, at("L2:swallow") - 0.3);
-  tl.to("#s2-phone", { y: 380, rotation: 40, svgOrigin: "625 1000", duration: 0.5, ease: "power2.in" }, at("L2:swallow") - 0.3);
+  const drop = at("L2:swallow") - 0.3;
+  tl.set("#s2-phone", { opacity: 1 }, drop);
+  tl.to("#s2-phone", { y: 300, rotation: 50, svgOrigin: "540 1046", duration: 0.5, ease: "power2.in" }, drop);
+  tl.set("#s2-phone", { opacity: 0 }, drop + 0.5);
+  tl.fromTo("#s2-splash", { opacity: 1, scale: 0.3, svgOrigin: "540 1320" }, { opacity: 0, scale: 1.4, duration: 0.6, ease: "power2.out" }, drop + 0.5);
+  tl.fromTo("#s2-drops", { opacity: 1, y: 40 }, { opacity: 0, y: -30, duration: 0.5, ease: "power2.out" }, drop + 0.5);
   fx.squash("#pip", at("L2:filled") - 0.1);
   fx.pop("#s2-fill", at("L2:filled"), { from: 0.2, origin: "50% 100%" });
-  fx.cam("#s2-cam", { scale: 1.25 }, at("L2:filled") - 0.3, 0.6, "620 1100");
+  fx.cam("#s2-cam", { scale: 1.3 }, at("L2:filled") - 0.3, 0.6, "500 1100");
 </script>

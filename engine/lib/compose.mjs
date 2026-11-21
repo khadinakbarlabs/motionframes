@@ -95,6 +95,16 @@ export function compose(model, { captions, sfxClips = [], music = "" }) {
   const lean = lines.map(({ id, start, end, words }) => ({ id, start, end, words }));
   const scn = scenes.map(({ id, start, end }) => ({ id, start, end }));
   const font = spec.font || "Archivo Black";
+  // Paper grain + soft vignette over every scene, so flat fills read as printed ink, not vector defaults.
+  // short.json: "texture": false to turn off, or { "grain": 0.07, "vignette": 0.28 } to tune.
+  const textureOverlay = ({ grain = 0.07, vignette = 0.28 }) => `<defs>
+  <filter id="ts-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" stitchTiles="stitch" /><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.4 -0.45" /></filter>
+  <radialGradient id="ts-vig" cx="50%" cy="48%" r="75%"><stop offset="55%" stop-color="#000" stop-opacity="0" /><stop offset="100%" stop-color="#000" stop-opacity="${vignette}" /></radialGradient>
+</defs>
+<g id="ts-texture" pointer-events="none">
+  <rect width="${W}" height="${H}" filter="url(#ts-grain)" opacity="${grain}" style="mix-blend-mode: multiply" />
+  <rect width="${W}" height="${H}" fill="url(#ts-vig)" />
+</g>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -119,6 +129,7 @@ ${spec.css ? indent(spec.css, 6) : ""}
       <div id="stage" class="clip" data-start="0" data-duration="${DUR}" data-track-index="0" data-track-kind="graphics" data-layout-allow-overflow data-layout-allow-overlap>
         <svg id="stage-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
 ${indent(svgBody, 10)}
+${spec.texture === false ? "" : indent(textureOverlay(spec.texture || {}), 10)}
         </svg>
       </div>
 ${cap.html}

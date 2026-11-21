@@ -12,6 +12,7 @@ export function captionGroups(model) {
   const maxWords = c.words ?? 2, maxDur = c.max ?? 1.8;
   const hot = new Set((c.hot || []).map(norm));
   const replace = Object.entries(c.replace || {}).map(([k, v]) => [norm(k), v]);
+  const oneWord = new Map(replace.filter(([k]) => !k.includes(" ")));
   const cased = (s) => (c.case === "lower" ? s.toLowerCase() : s.toUpperCase());
 
   let groups;
@@ -28,7 +29,8 @@ export function captionGroups(model) {
         for (const [k, v] of replace) if (text === k) { text = v; swapped = true; }
         groups.push({
           start: cur[0].start, lastEnd: cur.at(-1).end,
-          text: swapped ? text : cased(clean(cur.map((w) => w.text).join(" "))),
+          // single-word replacements also apply inside a multi-word group ("PIP'S GRIDGE" -> "PIP'S BRIDGE")
+          text: swapped ? text : cased(clean(cur.map((w) => oneWord.get(norm(w.text)) ?? w.text).join(" "))),
           hot: cur.some((w) => hot.has(norm(w.text))) || swapped,
         });
         cur = [];

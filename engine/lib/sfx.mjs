@@ -96,7 +96,7 @@ export function planCues(model, captions) {
     const t0 = at(c.at), n = c.count ?? 1;
     for (let i = 0; i < n; i++) {
       const jitter = n > 1 ? (i % 2 ? -0.04 : 0.04) * (c.vol ?? 0.4) : 0; // tiny level variation for repeats
-      list.push({ t: t0 + i * (c.every ?? 0), sfx: takes(c.sfx, i), vol: +((c.vol ?? 0.4) + jitter).toFixed(3), len: c.len, align: c.align || "peak" });
+      list.push({ t: t0 + i * (c.every ?? 0), sfx: takes(c.sfx, i), vol: +((c.vol ?? 0.4) + jitter).toFixed(3), len: c.len ?? (c.every ? +(c.every * 1.2).toFixed(2) : undefined), align: c.align || "peak" });
     }
   }
   if (snd.cutWhoosh) scenes.slice(1).forEach((s, i) => list.push({ t: s.start, sfx: i % 2 ? "swish" : "whoosh", vol: 0.3, len: 1.3, align: "peak" }));
