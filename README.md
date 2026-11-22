@@ -53,6 +53,9 @@ Gemini CLI:
 gemini extensions install https://github.com/khadinakbarlabs/motionframes
 ```
 
+(Gemini CLI 0.70.0 fails every git install with `Use of "GIT_CONFIG_SYSTEM" is not permitted`. Until Google fixes
+it, run the same command through `npx -y @google/gemini-cli@0.69.0`.)
+
 Then, in a new chat: *"Set up MotionFrames and make a test video."* The skill runs `setup --test` for you.
 
 Terminal only, no agent:
