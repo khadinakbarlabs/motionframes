@@ -43,7 +43,7 @@ function npmEnv() {
   if (existsSync(VPY) && !env.HYPERFRAMES_PYTHON) env.HYPERFRAMES_PYTHON = VPY;
   if (!env.npm_config_cache) {
     try { const p = join(homedir(), ".npm", "_cacache", "tmp"); mkdirSync(p, { recursive: true }); writeFileSync(join(p, ".motionframes-probe"), ""); }
-    catch { env.npm_config_cache = join(tmpdir(), "motionframes-npm"); }
+    catch { env.npm_config_cache = join(tmpdir(), "motionframes-npm"); env.MOTIONFRAMES_NPM_FALLBACK = "1"; }
   }
   return env;
 }
@@ -116,7 +116,7 @@ const commands = {
     row(existsSync(VPY), "Kokoro voice", "motionframes setup");
     let n = 0; try { n = Object.keys(JSON.parse(readFileSync(join(LIBRARY, "index.json"), "utf8"))).length; } catch {}
     row(true, `sound library: ${n} sounds in ${LIBRARY}`);
-    if (ENV.npm_config_cache) row(true, `npm cache: using ${ENV.npm_config_cache} (~/.npm is read-only here)`);
+    if (ENV.MOTIONFRAMES_NPM_FALLBACK) row(true, `npm cache: using ${ENV.npm_config_cache} (~/.npm is read-only here)`);
     return "doctor done";
   },
 
