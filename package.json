@@ -1,6 +1,6 @@
 {
   "name": "motionframes",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Animated vertical shorts from one spec file, rendered by HyperFrames.",
   "type": "module",
   "license": "Apache-2.0",

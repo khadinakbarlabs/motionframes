@@ -6,12 +6,13 @@
 //   motionframes layout  <dir>                          headless check: captions over faces/art (auto-moved), overlaps, cut-offs
 //   motionframes preview <dir>                          build + one still per scene -> snaps/preview/sheet.jpg
 //   motionframes init    <dir> [--rig bean|stick]        scaffold short.json + scenes/
-//   motionframes doctor  .                              check node, ffmpeg, HyperFrames, voice, sound library
-//   motionframes setup   .                              one-time: install the free local voice (Kokoro)
+//   motionframes setup   [--agent claude|codex|gemini|other] [--test]   one-time: tools, free voice, agent plugin, test short
+//   motionframes doctor                                 check node, ffmpeg, HyperFrames, voice, sound library
 //   single steps: voice [--voice am_michael --speed 1 --force] | words [--force] | sfx | build | check
 //                 stills [--at 1,5,9] | mix | render [--draft] | qa <file.mp4>
 import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, cpSync, rmSync, readdirSync } from "node:fs";
-import { env, cacheDir } from "./lib/paths.mjs";
+import { env, cacheDir, HF, hfArgs, cleanNpxEnv } from "./lib/paths.mjs";
+import { setup as runSetup, manual } from "./lib/setup.mjs";
 const require_fs = { readdirSync };
 import { join, resolve, dirname, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,18 +26,20 @@ import { storyReport } from "./lib/story.mjs";
 import { mixPreview, qaVideo, normalize } from "./lib/qa.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const HF = env("HF") || "hyperframes@0.9.74";
-const [cmd, dirArg, ...rest] = process.argv.slice(2);
+const [cmd, ...argv] = process.argv.slice(2);
+// setup and doctor need no folder: "motionframes setup --test" works
+const dirArg = argv[0] && !argv[0].startsWith("--") ? argv.shift() : ["setup", "doctor"].includes(cmd) ? "." : undefined;
+const rest = argv;
 const flag = (name, dflt) => { const i = rest.indexOf(`--${name}`); return i < 0 ? dflt : rest[i + 1] && !rest[i + 1].startsWith("--") ? rest[i + 1] : true; };
 const log = (...a) => console.log(...a);
 const VENV = cacheDir("kokoro");
-const VPY = join(VENV, "bin", "python");
+const VPY = join(VENV, process.platform === "win32" ? join("Scripts", "python.exe") : join("bin", "python"));
 const rel = (p) => { const r = relative(process.cwd(), p) || "."; return r.startsWith("../..") ? p : r; };
 const secs = (ms) => (ms / 1000).toFixed(1) + "s";
 
 // npm needs a writable cache for npx. Inside a sandbox ~/.npm is often read-only: fall back to a temp cache.
 function npmEnv() {
-  const env = { ...process.env };
+  const env = cleanNpxEnv();
   if (existsSync(VPY) && !env.HYPERFRAMES_PYTHON) env.HYPERFRAMES_PYTHON = VPY;
   if (!env.npm_config_cache) {
     try { const p = join(homedir(), ".npm", "_cacache", "tmp"); mkdirSync(p, { recursive: true }); writeFileSync(join(p, ".motionframes-probe"), ""); }
@@ -56,7 +59,8 @@ function explain(out) {
   return lines.slice(-4).join(" | ").slice(0, 400) || "no output";
 }
 function hf(args, { cwd, quiet = true } = {}) {
-  const r = spawnSync("npx", ["-y", HF, ...args], { cwd, env: ENV, encoding: "utf8", maxBuffer: 1 << 28, stdio: quiet ? ["ignore", "pipe", "pipe"] : "inherit" });
+  if (existsSync(VPY) && !process.env.HYPERFRAMES_PYTHON) ENV.HYPERFRAMES_PYTHON = VPY; // setup may have just installed it
+  const r = spawnSync("npx", hfArgs(...args), { cwd, env: ENV, shell: process.platform === "win32", encoding: "utf8", maxBuffer: 1 << 28, stdio: quiet ? ["ignore", "pipe", "pipe"] : "inherit" });
   const out = (r.stdout || "") + (r.stderr || "");
   if (r.status !== 0) { const e = new Error(`hyperframes ${args[0]} failed: ${explain(out)}`); e.out = out; throw e; }
   return out;
@@ -99,22 +103,17 @@ function findChrome() {
 
 const commands = {
   setup() {
-    if (existsSync(VPY)) return `voice runtime already installed: ${VENV}`;
-    log(`  installing Kokoro (free local voice) into ${VENV} ...`);
-    mkdirSync(dirname(VENV), { recursive: true });
-    execFileSync("python3", ["-m", "venv", VENV], { stdio: "inherit" });
-    execFileSync(VPY, ["-m", "pip", "install", "-q", "kokoro-onnx", "soundfile"], { stdio: "inherit" });
-    return "voice runtime installed: \"motionframes voice\" now works offline";
+    return runSetup({ hf, log, flag, rest, commands, VENV, VPY, root: resolve(HERE, "..") });
   },
 
   doctor() {
     const row = (ok, what, fix = "") => log(`  ${ok ? "ok  " : "MISS"} ${what}${ok || !fix ? "" : `  -> ${fix}`}`);
     row(Number(process.versions.node.split(".")[0]) >= 20, `node ${process.versions.node}`, "install Node 20+");
     const ff = spawnSync("ffmpeg", ["-version"], { encoding: "utf8" });
-    row(ff.status === 0, `ffmpeg ${(ff.stdout || "").split(" ")[2] || ""}`, "brew install ffmpeg");
+    row(ff.status === 0, `ffmpeg ${(ff.stdout || "").split(" ")[2] || ""}`, manual("ffmpeg"));
     let ver = ""; try { ver = hf(["--version"]).trim().split("\n").pop(); } catch (e) { ver = ""; }
     row(!!ver, `HyperFrames ${ver || HF}`, "needs network once for npx");
-    row(existsSync(VPY), "Kokoro voice", "motionframes setup .");
+    row(existsSync(VPY), "Kokoro voice", "motionframes setup");
     let n = 0; try { n = Object.keys(JSON.parse(readFileSync(join(LIBRARY, "index.json"), "utf8"))).length; } catch {}
     row(true, `sound library: ${n} sounds in ${LIBRARY}`);
     if (ENV.npm_config_cache) row(true, `npm cache: using ${ENV.npm_config_cache} (~/.npm is read-only here)`);
@@ -139,7 +138,7 @@ const commands = {
       const audio = l.audio || `assets/vo-${l.id}.wav`;
       log(`  voicing ${l.id} (${voice}): "${l.text.slice(0, 50)}${l.text.length > 50 ? "..." : ""}"`);
       try { hf(["tts", l.text, "--voice", String(voice), "--speed", String(speed), "-o", join(dir, audio)]); }
-      catch (e) { throw new Error(`voice failed for ${l.id}: ${e.message}\n  First time? Run "motionframes setup ." once, or record your own lines and set "audio".`); }
+      catch (e) { throw new Error(`voice failed for ${l.id}: ${e.message}\n  First time? Run "motionframes setup" once, or record your own lines and set "audio".`); }
       made++;
       return { ...l, audio };
     });
@@ -228,7 +227,7 @@ const commands = {
 
   check(dir) {
     if (!existsSync(join(dir, "index.html"))) throw new Error(`no index.html yet: run "motionframes build ${rel(dir)}" first`);
-    const r = spawnSync("npx", ["-y", HF, "check", "--json"], { cwd: dir, env: ENV, encoding: "utf8", maxBuffer: 1 << 26 });
+    const r = spawnSync("npx", hfArgs("check", "--json"), { cwd: dir, env: ENV, encoding: "utf8", maxBuffer: 1 << 26 });
     const out = r.stdout || "";
     let j; try { j = JSON.parse(out.slice(out.indexOf("{"))); } catch { throw new Error(`hyperframes check gave no report: ${explain(out + r.stderr)}`); }
     const sections = ["lint", "runtime", "layout", "motion", "contrast", "craft", "audio"].filter((k) => j[k]);
@@ -270,7 +269,7 @@ const commands = {
     const tty = process.stdout.isTTY;
     const once = () => new Promise((ok) => {
       let shown = -1, tail = "";
-      const p = spawn("npx", ["-y", HF, "render", "-o", raw, "-q", q], { cwd: dir, env: ENV });
+      const p = spawn("npx", hfArgs("render", "-o", raw, "-q", q), { cwd: dir, env: ENV });
       const onData = (b) => {
         const s = b.toString(); tail = (tail + s).slice(-6000);
         const ms = [...s.matchAll(/(\d{1,3})%/g)]; if (!ms.length) return;

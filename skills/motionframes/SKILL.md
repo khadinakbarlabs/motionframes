@@ -1,6 +1,6 @@
 ---
 name: motionframes
-description: Make an animated vertical short (YouTube Shorts, Reels, TikTok) from a topic or script. Use when the user asks for an animated short, reel, cartoon explainer, stick-figure video, "hidden reason" short or character story under ~90 s. Claude writes the story and the scene art; the motionframes engine times scenes, captions, lip sync, camera, transitions and sound effects to the voice and renders with HyperFrames.
+description: Make an animated vertical short (YouTube Shorts, Reels, TikTok) from a topic or script. Use when the user asks for an animated short, reel, cartoon explainer, stick-figure video, "hidden reason" short or character story under ~90 s. You (the assistant: Claude, Codex, Gemini or any agent) write the story and the scene art; the MotionFrames engine times scenes, captions, lip sync, camera, transitions and sound effects to the voice and renders with HyperFrames.
 ---
 
 # MotionFrames
@@ -10,7 +10,8 @@ You do the creative work (story, picture, acting beats). The engine does the tim
 transitions, keeping characters alive, the captions, the sound and the QA.
 
 Engine: `node <plugin>/engine/motionframes.mjs <command> <dir>` (Node 20+, ffmpeg, npx). `<plugin>` is this
-skill's plugin root (two folders up from this file). Run `motionframes doctor .` once if anything fails.
+skill's plugin root (two folders up from this file). First time on this computer, or if anything fails:
+`node <plugin>/engine/motionframes.mjs setup --test` (installs what is missing, prints `ready` when it all works).
 
 ## The loop
 

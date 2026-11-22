@@ -7,6 +7,68 @@
 MotionFrames times every scene cut, caption, mouth flap and sound effect to the voice, then renders
 with [HyperFrames](https://github.com/heygen-com/hyperframes).
 
+## Install
+
+**One prompt, any coding agent** (Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Cline). Paste this:
+
+```text
+Set up MotionFrames on this computer and prove it works. MotionFrames is a free, open-source (Apache-2.0)
+AI animation tool: https://github.com/khadinakbarlabs/motionframes
+
+1. Check `node --version`. If Node is missing or older than 20, install Node 20+ first
+   (macOS: brew install node, Windows: winget install -e --id OpenJS.NodeJS.LTS, Linux: https://nodejs.org).
+2. Run this (it needs internet; allow network access if you are asked). Replace AGENT with claude, codex or
+   gemini if that is what you are, otherwise with other:
+   npx -y github:khadinakbarlabs/motionframes setup --agent AGENT --test
+   It checks FFmpeg and Python and installs them with Homebrew or winget when it can, installs the free
+   Kokoro voice, sets up word timing and Chrome, installs the MotionFrames plugin for you, and renders a
+   7-second test video.
+3. If it stops and prints commands to run (for example a sudo command on Linux), run them or show them to
+   me, then run step 2 again.
+4. When the last line says "setup: ready", reply "ready" with the path of the test video, and
+   tell me to start a new chat so the MotionFrames skill loads.
+```
+
+**Or one command per platform:**
+
+Claude Code (type inside Claude Code, or use `claude plugin ...` in a terminal):
+
+```text
+/plugin marketplace add khadinakbarlabs/motionframes
+```
+
+```text
+/plugin install motionframes@motionframes
+```
+
+Codex:
+
+```bash
+codex plugin marketplace add khadinakbarlabs/motionframes && codex plugin add motionframes@motionframes
+```
+
+Gemini CLI:
+
+```bash
+gemini extensions install https://github.com/khadinakbarlabs/motionframes
+```
+
+Then, in a new chat: *"Set up MotionFrames and make a test video."* The skill runs `setup --test` for you.
+
+Terminal only, no agent:
+
+```bash
+npx -y github:khadinakbarlabs/motionframes setup --test
+```
+
+For a permanent `motionframes` command: `npm install -g github:khadinakbarlabs/motionframes`.
+
+`setup` checks Node 20+, FFmpeg and Python 3.10-3.13. It installs missing ones with Homebrew (macOS) or winget
+(Windows) and otherwise prints the exact command for your OS (`--no-install` only prints). Then it installs the
+free Kokoro voice into `~/.cache/motionframes`, downloads the whisper model and Chrome once, and with `--test`
+renders and QA-checks a 7-second video. Tested on macOS (Apple Silicon); the Windows and Linux paths are
+written but not yet tested.
+
 The best ideas from five open-source animation projects, merged into one free pipeline:
 
 | from | what you get |
@@ -47,26 +109,6 @@ The best ideas from five open-source animation projects, merged into one free pi
 - **One command**: `motionframes go` runs voice, words, sounds, build, check, preview stills, mix, render,
   -14 LUFS and QA (black frames, frozen picture, dead air, loudness, true peak) with a timing per step.
 
-## Install
-
-Needs Node 20+, ffmpeg and Chrome (HyperFrames downloads what it needs through `npx`).
-
-```bash
-claude plugin marketplace add khadinakbarlabs/motionframes
-```
-
-```bash
-claude plugin install motionframes@motionframes
-```
-
-One-time, for the free offline voice (Kokoro, installed into `~/.cache/motionframes`):
-
-```bash
-node engine/motionframes.mjs setup .
-```
-
-Then ask Claude: *"Make an animated short about why bridges have gaps."*
-
 ## Use it by hand
 
 ```bash
@@ -91,8 +133,8 @@ node engine/motionframes.mjs go my-short
 | `story <dir>` | hook / turn / loop / pace / shot checks |
 | `layout <dir>` | headless layout pass: caption bands, overlaps, cut-offs, safe area |
 | `preview <dir>` | build + one still per scene -> `snaps/preview/sheet.jpg` |
-| `doctor .` | check node, ffmpeg, HyperFrames, voice and sound library |
-| `setup .` | one-time install of the free local voice |
+| `setup [--agent claude\|codex\|gemini\|other] [--test]` | one-time: tools, free voice, models, agent plugin, test video |
+| `doctor` | check node, ffmpeg, HyperFrames, voice and sound library |
 | `init <dir>` | scaffold `short.json` + `scenes/` |
 | `voice` / `words` / `sfx` / `build` / `check` / `stills` / `mix` / `render` / `qa` | single steps |
 

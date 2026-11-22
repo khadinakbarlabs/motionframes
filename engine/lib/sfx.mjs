@@ -10,7 +10,7 @@
 //   caption pops skip moments that already have a sound; long sounds and beds duck 30% under the voice.
 // short.json "music": { "file": "assets/music.mp3", "vol": 0.14 }
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { env, cacheDir } from "./paths.mjs";
+import { env, cacheDir, hfArgs, cleanNpxEnv } from "./paths.mjs";
 import { join, isAbsolute } from "node:path";
 import { execFileSync } from "node:child_process";
 import { homedir } from "node:os";
@@ -31,7 +31,6 @@ function saveToLibrary(dir, intent, rec) {
   } catch { /* library is a cache: never fail a build over it */ }
 }
 
-const HF = env("HF") || "hyperframes@0.9.74";
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const BLOCKED = /\bnc\b|non-?commercial|\bnd\b|no-?deriv/i;
 
@@ -62,13 +61,13 @@ export function lockPath(dir) { return join(dir, "sfx.lock.json"); }
 export function readLock(dir) { return existsSync(lockPath(dir)) ? JSON.parse(readFileSync(lockPath(dir), "utf8")) : {}; }
 
 function searchOnline(dir, intent) {
-  const run = (args) => execFileSync("npx", ["-y", HF, "media-use", "resolve", "--type", "sfx", "--intent", intent, "--project", dir, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120000 });
+  const run = (args) => execFileSync("npx", hfArgs("media-use", "resolve", "--type", "sfx", "--intent", intent, "--project", dir, ...args), { encoding: "utf8", env: cleanNpxEnv(), stdio: ["ignore", "pipe", "pipe"], timeout: 120000 });
   let out;
   try { out = run([]); } catch (e) {
     const why = String(e.stderr || e.message);
     // media-use refuses to fetch when a similar sound is already cached: reuse the best-named candidate
     if (!/similar cached asset/i.test(why)) throw new Error(why.split("\n").filter((l) => /media-use|error/i.test(l)).slice(-2).join(" ") || why.slice(0, 200));
-    const list = execFileSync("npx", ["-y", HF, "media-use", "resolve", "--candidates", "--type", "sfx", "--intent", intent, "--project", dir], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    const list = execFileSync("npx", hfArgs("media-use", "resolve", "--candidates", "--type", "sfx", "--intent", intent, "--project", dir), { encoding: "utf8", env: cleanNpxEnv(), stdio: ["ignore", "pipe", "pipe"] });
     const words = intent.toLowerCase().split(/\s+/);
     const cands = [...list.matchAll(/--reuse\s+(\w+)\s*\n\s*\[\w+\]\s+(.+)/g)].map((m) => ({ sha: m[1], name: m[2].toLowerCase() }));
     const pick = cands.find((c) => words.every((w) => c.name.includes(w))) || cands.find((c) => words.some((w) => w.length > 3 && c.name.includes(w)));

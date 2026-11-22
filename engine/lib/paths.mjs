@@ -11,3 +11,15 @@ export function cacheDir(sub) {
   const old = join(homedir(), ".cache", "toonshorts", sub);
   return !existsSync(now) && existsSync(old) ? old : now;
 }
+
+// HyperFrames runs through npx. Always name the package and the binary: when MotionFrames itself was started
+// by npx (`npx github:khadinakbarlabs/motionframes ...`), npm leaves npm_config_package set and a bare
+// `npx hyperframes@x` would try to run "hyperframes@x" as a command.
+export const HF = env("HF") || "hyperframes@0.9.74";
+export const hfArgs = (...args) => ["-y", `--package=${HF}`, "hyperframes", ...args];
+export function cleanNpxEnv(base = process.env) {
+  const out = { ...base };
+  for (const k of Object.keys(out)) if (/^npm_config_(package|call|yes)$/i.test(k) || /^npm_(lifecycle|package)_/i.test(k)) delete out[k];
+  out.npm_config_update_notifier = "false"; // keep CLI output clean
+  return out;
+}

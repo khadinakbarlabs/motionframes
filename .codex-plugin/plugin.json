@@ -1,0 +1,24 @@
+{
+  "name": "motionframes",
+  "version": "0.4.0",
+  "description": "AI animation creator: animated videos from one spec file. Claude or Codex writes the story and scene art; MotionFrames times every scene, caption, mouth shape and sound effect to the voice and renders with HyperFrames.",
+  "author": { "name": "Khadin Akbar", "url": "https://github.com/khadinakbarlabs" },
+  "homepage": "https://github.com/khadinakbarlabs/motionframes",
+  "repository": "https://github.com/khadinakbarlabs/motionframes",
+  "license": "Apache-2.0",
+  "keywords": ["animation", "video", "shorts", "reels", "tiktok", "hyperframes", "gsap"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "MotionFrames",
+    "shortDescription": "Animated videos timed to the voice, rendered locally",
+    "longDescription": "Write a topic, get an animated vertical video: story beats, characters that act and lip-sync, layered backdrops, camera moves, captions placed clear of faces, sound effects, -14 LUFS mix and a QA check. Free path: local Kokoro voice and local whisper timing.",
+    "developerName": "Khadin Akbar",
+    "category": "Creativity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/khadinakbarlabs/motionframes",
+    "defaultPrompt": [
+      "Set up MotionFrames on this computer and make a test video",
+      "Make a 40-second animated short about why bridges have gaps"
+    ]
+  }
+}
