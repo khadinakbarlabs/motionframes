@@ -4,7 +4,7 @@ The engine finds every sound by plain words (`"sfx": "metal clank"`), converts a
 so its loudest moment lands one frame after the picture. `sfx.lock.json` pins each sound; `SOUND-CREDITS.md`
 lists the credits.
 
-- Lookup order: the project lock -> the shared library (`~/.cache/toonshorts/sounds`, every sound found
+- Lookup order: the project lock -> the shared library (`~/.cache/motionframes/sounds`, every sound found
   before, with its licence) -> online search through `hyperframes media-use` (free CC0 / CC BY).
   A sound that cannot be found is reported and its cues are skipped: the build does not stop.
 - A cue for **every visible action**: steps, pops, impacts, slides, pours, groans. 1.5-3 cues per second is normal.

@@ -1,7 +1,10 @@
-# toonshorts
+# MotionFrames
+
+> Formerly **toonshorts**. The `toonshorts` command still works as an alias, and an existing
+> `~/.cache/toonshorts` (voice and sound library) is reused.
 
 **Animated vertical shorts from one spec file.** Claude writes the story and draws each scene;
-toonshorts times every scene cut, caption, mouth flap and sound effect to the voice, then renders
+MotionFrames times every scene cut, caption, mouth flap and sound effect to the voice, then renders
 with [HyperFrames](https://github.com/heygen-com/hyperframes).
 
 The best ideas from five open-source animation projects, merged into one free pipeline:
@@ -16,10 +19,10 @@ The best ideas from five open-source animation projects, merged into one free pi
 
 ## What is automatic
 
-- **Story doctor** (`toonshorts story`): scores the script and shot plan on what keeps people watching:
+- **Story doctor** (`motionframes story`): scores the script and shot plan on what keeps people watching:
   hook length and trigger, on-screen hook text, the turn, a concrete number, a loop ending, length, voice
   pace, shot length (jump cuts count) and the longest stretch with nothing new on screen.
-- **Stable layout** (`toonshorts layout`): opens the short in headless Chrome, steps through it every 0.2 s,
+- **Stable layout** (`motionframes layout`): opens the short in headless Chrome, steps through it every 0.2 s,
   picks one caption band per scene that stays clear of faces and key art, drops captions that repeat a label
   already on screen, and flags text on text, art cut off by the frame, and labels outside the area TikTok,
   Reels and Shorts all keep clear of their buttons.
@@ -41,7 +44,7 @@ The best ideas from five open-source animation projects, merged into one free pi
 - **Sound** by plain words (`"sfx": "metal clank"`): free CC0/CC BY sounds, a shared local library so a sound
   is only searched once, hits placed one frame after the picture, ducking under the voice, credits written
   for you. Non-commercial licences blocked. Missing sounds are reported, not fatal.
-- **One command**: `toonshorts go` runs voice, words, sounds, build, check, preview stills, mix, render,
+- **One command**: `motionframes go` runs voice, words, sounds, build, check, preview stills, mix, render,
   -14 LUFS and QA (black frames, frozen picture, dead air, loudness, true peak) with a timing per step.
 
 ## Install
@@ -49,17 +52,17 @@ The best ideas from five open-source animation projects, merged into one free pi
 Needs Node 20+, ffmpeg and Chrome (HyperFrames downloads what it needs through `npx`).
 
 ```bash
-claude plugin marketplace add khadinakbarlabs/toonshorts
+claude plugin marketplace add khadinakbarlabs/motionframes
 ```
 
 ```bash
-claude plugin install toonshorts@toonshorts
+claude plugin install motionframes@motionframes
 ```
 
-One-time, for the free offline voice (Kokoro, installed into `~/.cache/toonshorts`):
+One-time, for the free offline voice (Kokoro, installed into `~/.cache/motionframes`):
 
 ```bash
-node engine/toonshorts.mjs setup .
+node engine/motionframes.mjs setup .
 ```
 
 Then ask Claude: *"Make an animated short about why bridges have gaps."*
@@ -67,19 +70,19 @@ Then ask Claude: *"Make an animated short about why bridges have gaps."*
 ## Use it by hand
 
 ```bash
-node engine/toonshorts.mjs init my-short
+node engine/motionframes.mjs init my-short
 ```
 
 Edit `my-short/short.json` and `my-short/scenes/*.html`, then preview (about 30 s):
 
 ```bash
-node engine/toonshorts.mjs go my-short --no-render
+node engine/motionframes.mjs go my-short --no-render
 ```
 
 Look at `my-short/snaps/preview/sheet.jpg`, then render the checked mp4 (about 2 minutes for 60 s):
 
 ```bash
-node engine/toonshorts.mjs go my-short
+node engine/motionframes.mjs go my-short
 ```
 
 | command | does |
@@ -108,7 +111,7 @@ A full example lives in [`examples/bridge-gaps`](examples/bridge-gaps): 7 scenes
 </script>
 ```
 
-Full reference: [`skills/toonshorts/references/spec.md`](skills/toonshorts/references/spec.md).
+Full reference: [`skills/motionframes/references/spec.md`](skills/motionframes/references/spec.md).
 
 ## Licence
 

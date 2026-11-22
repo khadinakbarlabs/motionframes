@@ -101,7 +101,7 @@ export function captionBands(spec) {
   return [...new Set([high, 600, 1010, 330])];  // all inside the TikTok/Reels/Shorts safe area (y 288-1248)
 }
 
-// apply caption tops chosen by "toonshorts layout" (layout.json), matched by start time + text
+// apply caption tops chosen by "motionframes layout" (layout.json), matched by start time + text
 export function applyLayout(groups, layout) {
   if (!layout || !Array.isArray(layout.captions)) return groups;
   const m = new Map(layout.captions.map((c) => [`${c.start}|${c.text}`, c.top]));
@@ -117,7 +117,7 @@ export function captionCss(spec) {
         letter-spacing: 0.01em; -webkit-text-stroke: 14px var(--ink); paint-order: stroke fill;
         filter: drop-shadow(0 9px 0 rgba(15, 18, 32, 0.55)); }
       .cap.hook span { font-size: ${Math.round((c.size ?? 92) * 1.15)}px; line-height: 1.02; max-width: 760px; }
-      .cap.hook .hot { font-size: inherit; }
+      .cap.hook .hot { font-size: inherit; -webkit-text-stroke: 14px var(--ink); paint-order: stroke fill; }
       .cap.low { padding: 0 305px 0 125px; }   /* below y 840 TikTok's buttons start at x 780 */
       .cap .hot { color: var(--hot); font-size: ${Math.round((c.size ?? 92) * 1.12)}px; }`;
 }

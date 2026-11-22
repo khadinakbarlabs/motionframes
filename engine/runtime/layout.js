@@ -1,4 +1,4 @@
-// toonshorts layout audit. Runs only when the page is opened with ?ts-audit (by "toonshorts layout"),
+// motionframes layout audit. Runs only when the page is opened with ?ts-audit (by "motionframes layout"),
 // never during a render. It steps the timeline every 0.2 s and measures what is on screen:
 //   - faces (rig heads + hats) and key art (<text>, [data-key]) per frame
 //   - which caption band (high / mid / low) keeps each caption clear of faces and key art

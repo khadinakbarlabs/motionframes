@@ -45,7 +45,7 @@ function validate(raw) {
 
 export function readSpec(dir) {
   const p = join(dir, "short.json");
-  if (!existsSync(p)) throw new Error(`no short.json in ${dir} (run "toonshorts init ${dir}")`);
+  if (!existsSync(p)) throw new Error(`no short.json in ${dir} (run "motionframes init ${dir}")`);
   let raw;
   try { raw = JSON.parse(readFileSync(p, "utf8")); } catch (e) { throw new Error(`short.json is not valid JSON: ${e.message}`); }
   validate(raw);
@@ -58,7 +58,7 @@ export function loadModel(dir, { needWords = true } = {}) {
   let t = spec.lead;
   const warnings = [];
   const lines = spec.lines.map((l, i) => {
-    if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio file yet: run "toonshorts voice ${dir}"`);
+    if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio file yet: run "motionframes voice ${dir}"`);
     let audio = l.audio, wordsRel = wordsPathFor(l.audio);
     // "pace": shorten long pauses + speed up delivery (exact word remap); needs word timings first
     if (spec.pace && l.pace !== false && existsSync(join(dir, wordsRel))) {
@@ -72,7 +72,7 @@ export function loadModel(dir, { needWords = true } = {}) {
     if (existsSync(wp)) {
       words = JSON.parse(readFileSync(wp, "utf8")).map((w) => ({ text: w.text, start: r3(start + w.start), end: r3(start + w.end) }));
     } else if (needWords) {
-      warnings.push(`line ${l.id}: no word timings (${wordsPathFor(l.audio)}) — run "toonshorts words ${dir}"`);
+      warnings.push(`line ${l.id}: no word timings (${wordsPathFor(l.audio)}) — run "motionframes words ${dir}"`);
     }
     t = start + dur;
     return { id: l.id, text: l.text, audio, volume: l.volume ?? 1, start, end: r3(start + dur), dur: r3(dur), words };

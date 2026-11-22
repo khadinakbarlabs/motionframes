@@ -1,7 +1,7 @@
-// toonshorts acting + camera helpers, inlined into every built short.
+// motionframes acting + camera helpers, inlined into every built short.
 // All helpers write tweens onto the one paused timeline `tl`, so every frame is a
 // function of time (no timers, no unseeded random, no infinite repeats).
-// Rules behind the numbers: skills/toonshorts/references/motion.md.
+// Rules behind the numbers: skills/motionframes/references/motion.md.
 
 function makeFx(tl, opts) {
   const FPS = opts.fps || 30, F = 1 / FPS;

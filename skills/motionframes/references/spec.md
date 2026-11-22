@@ -5,7 +5,7 @@
 ```json
 {
   "title": "Why bridges have gaps",
-  "voice": "am_michael",                      // Kokoro voice for "toonshorts voice" (af_heart, bm_george, ...)
+  "voice": "am_michael",                      // Kokoro voice for "motionframes voice" (af_heart, bm_george, ...)
   "fps": 30, "lead": 0.3, "gap": 0.3, "tail": 1.0,   // defaults; gap = pause between lines
   "palette": { "ink": "#0f1220", "paper": "#f3eadb", "bg": "#0f1220", "hot": "#ffc93c" },
   "font": "Archivo Black",
@@ -35,7 +35,7 @@
 **`jumps`**: instant reframes of the scene on a word (jump cuts): `scale`, `origin`, `x`, `y`. Use them to cut
 a long explainer into 2-4 s shots, or `{ "at": "s8", "y": 150 }` to shift a whole scene's framing.
 
-**Layout**: `toonshorts layout` writes `layout.json` (the caption band chosen per caption) and
+**Layout**: `motionframes layout` writes `layout.json` (the caption band chosen per caption) and
 `layout-report.json`; the build reads `layout.json`. Delete it to start over.
 
 **`cam`** (the scene's own slow move, with parallax on every `data-depth` layer): `push`, `pull`,

@@ -1,4 +1,4 @@
-<!-- toonshorts rig: "stick" — big white head, thick ink limbs, feet on y=0, facing +x, ~330 px tall at scale 1.
+<!-- motionframes rig: "stick" — big white head, thick ink limbs, feet on y=0, facing +x, ~330 px tall at scale 1.
      Use in a scene:  <rig type="stick" id="max" x="300" y="1500" scale="1" shirt="#ff6b4a" />
      Parts (animate these ids): {{id}} (whole, x/y moves), {{id}}-body, {{id}}-head, {{id}}-eyes,
      {{id}}-mouth (closed), {{id}}-mouthO (open), {{id}}-brows, {{id}}-armL, {{id}}-armR, {{id}}-legL, {{id}}-legR, {{id}}-prop (empty slot in the front hand), {{id}}-headbob. Joint groups carry invisible pivot circles (rotate about "50% 50%") -->

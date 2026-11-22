@@ -1,9 +1,9 @@
 # Third-party notices
 
-toonshorts re-implements ideas from the projects below. No source files, reference frames,
+motionframes re-implements ideas from the projects below. No source files, reference frames,
 character sheets or fonts were copied unless noted. Each MIT licence is reproduced in full.
 
-| Project | Licence | What toonshorts learned from it |
+| Project | Licence | What motionframes learned from it |
 |---|---|---|
 | [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) | Apache-2.0 | Render backend (called via `npx hyperframes`), composition contract, safe zones, motion and acting doctrine |
 | [JDhruv14/line-art-animation](https://github.com/JDhruv14/line-art-animation) | MIT | Planted-foot walk cycle, idle breathing, spring secondary motion, two-stroke limbs |

@@ -1,10 +1,10 @@
 {
-  "name": "toonshorts",
-  "description": "Animated vertical shorts from one spec file. Claude writes the story and the scene art; toonshorts times every scene, caption, mouth flap and sound effect to the voice, then renders with HyperFrames. Free path: local Kokoro voice, local whisper timing, CC0/CC BY sounds with auto credits.",
-  "version": "0.3.0",
+  "name": "motionframes",
+  "description": "Animated vertical shorts from one spec file. Claude writes the story and the scene art; motionframes times every scene, caption, mouth flap and sound effect to the voice, then renders with HyperFrames. Free path: local Kokoro voice, local whisper timing, CC0/CC BY sounds with auto credits.",
+  "version": "0.3.1",
   "author": { "name": "Khadin Akbar", "url": "https://github.com/khadinakbarlabs" },
-  "homepage": "https://github.com/khadinakbarlabs/toonshorts",
-  "repository": "https://github.com/khadinakbarlabs/toonshorts",
+  "homepage": "https://github.com/khadinakbarlabs/motionframes",
+  "repository": "https://github.com/khadinakbarlabs/motionframes",
   "license": "Apache-2.0",
   "keywords": ["shorts", "reels", "tiktok", "animation", "hyperframes", "gsap", "video"]
 }

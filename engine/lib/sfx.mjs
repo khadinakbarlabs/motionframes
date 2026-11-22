@@ -10,14 +10,15 @@
 //   caption pops skip moments that already have a sound; long sounds and beds duck 30% under the voice.
 // short.json "music": { "file": "assets/music.mp3", "vol": 0.14 }
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { env, cacheDir } from "./paths.mjs";
 import { join, isAbsolute } from "node:path";
 import { execFileSync } from "node:child_process";
 import { homedir } from "node:os";
 import { copyFileSync } from "node:fs";
 
-// Shared library of every sound toonshorts has found before (with its licence), so a new short
-// reuses "whoosh" and "pop" instead of searching the web again. Override with TOONSHORTS_SOUNDS.
-export const LIBRARY = process.env.TOONSHORTS_SOUNDS || join(homedir(), ".cache", "toonshorts", "sounds");
+// Shared library of every sound motionframes has found before (with its licence), so a new short
+// reuses "whoosh" and "pop" instead of searching the web again. Override with MOTIONFRAMES_SOUNDS.
+export const LIBRARY = env("SOUNDS") || cacheDir("sounds");
 const libIndex = () => join(LIBRARY, "index.json");
 function readLibrary() { try { return JSON.parse(readFileSync(libIndex(), "utf8")); } catch { return {}; } }
 function saveToLibrary(dir, intent, rec) {
@@ -30,7 +31,7 @@ function saveToLibrary(dir, intent, rec) {
   } catch { /* library is a cache: never fail a build over it */ }
 }
 
-const HF = process.env.TOONSHORTS_HF || "hyperframes@0.9.74";
+const HF = env("HF") || "hyperframes@0.9.74";
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const BLOCKED = /\bnc\b|non-?commercial|\bnd\b|no-?deriv/i;
 

@@ -1,10 +1,10 @@
 {
-  "name": "toonshorts",
-  "version": "0.3.0",
+  "name": "motionframes",
+  "version": "0.3.1",
   "description": "Animated vertical shorts from one spec file, rendered by HyperFrames.",
   "type": "module",
   "license": "Apache-2.0",
-  "bin": { "toonshorts": "engine/toonshorts.mjs" },
+  "bin": { "motionframes": "engine/motionframes.mjs", "toonshorts": "engine/motionframes.mjs" },
   "engines": { "node": ">=20" },
-  "repository": "github:khadinakbarlabs/toonshorts"
+  "repository": "github:khadinakbarlabs/motionframes"
 }

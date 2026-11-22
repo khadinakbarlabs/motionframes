@@ -1,6 +1,6 @@
 // Story doctor: checks the script and the shot plan against what keeps people watching a short.
 // Text checks run on short.json alone; timing checks need the voice and word timings.
-// Rules and the reasons behind them: skills/toonshorts/references/hooks.md.
+// Rules and the reasons behind them: skills/motionframes/references/hooks.md.
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadModel, readSpec } from "./spec.mjs";

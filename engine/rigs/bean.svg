@@ -1,4 +1,4 @@
-<!-- toonshorts rig: "bean" (v2): 2.5D ink-cartoon character. Front-facing, feet on y=0, ~610 px tall at scale 1 (with hat).
+<!-- motionframes rig: "bean" (v2): 2.5D ink-cartoon character. Front-facing, feet on y=0, ~610 px tall at scale 1 (with hat).
      Outlined limbs (ink under colour), shaded torso and head, hands, brows, pupils, cheeks, 6 mouth shapes.
      Use:  <rig type="bean" id="pip" x="480" y="1120" scale="1" shirt="#2ec4b6" hat="#ffc93c" prop="clipboard"
                 face="happy" pose="idle" talks="L2,L5" life="on" />

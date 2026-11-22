@@ -153,7 +153,7 @@ export function compose(model, { captions, sfxClips = [], music = "" }) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=${W}, height=${H}" />
-    <!-- built by toonshorts from short.json: edit the spec and scenes/, then run "toonshorts build" -->
+    <!-- built by motionframes from short.json: edit the spec and scenes/, then run "motionframes build" -->
     <script src="${GSAP}"></script>
     <style>
       :root { --ink: ${palette.ink}; --paper: ${palette.paper}; --hot: ${palette.hot || "#ffc93c"}; --font-caption: "${font}", sans-serif; }

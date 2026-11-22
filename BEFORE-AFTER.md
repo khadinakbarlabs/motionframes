@@ -1,5 +1,7 @@
 # Before / after: toonshorts 0.2.1 → 0.3.0 (22 Nov 2026)
 
+> Written when the project was called **toonshorts**; it is now **MotionFrames** (same engine, same commands under the new name).
+
 Same story ("Why bridges have gaps"), same five recorded voice lines, same sounds. The after version is
 tightened by the new `pace` step (long pauses shortened, delivery 10% faster, hook line 22% faster), so it runs
 55.2 s instead of 64.4 s with every word still in place.

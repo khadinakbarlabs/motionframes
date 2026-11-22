@@ -53,7 +53,7 @@ export function qaVideo(dir, mp4) {
   if (black.length) issues.push(`black frames at ${black.map(([a, b]) => `${a.toFixed(2)}-${b.toFixed(2)}s`).join(", ")}`);
   if (freezes.length) issues.push(`frozen picture (>= ${TARGET.freezeFrames} frames) at ${freezes.map(([a, b]) => `${a.toFixed(2)}-${Number.isFinite(b) ? b.toFixed(2) : "end"}s`).join(", ")}: add creep, boil or a move`);
   if (silences.length) issues.push(`dead air (> ${TARGET.silence}s) starting at ${silences.map((s) => s.toFixed(2) + "s").join(", ")}`);
-  if (!(Math.abs(loud.lufs - TARGET.lufs) <= TARGET.lufsTol)) issues.push(`loudness ${loud.lufs} LUFS (want ${TARGET.lufs} ± ${TARGET.lufsTol}): "toonshorts render" normalises; re-run it`);
+  if (!(Math.abs(loud.lufs - TARGET.lufs) <= TARGET.lufsTol)) issues.push(`loudness ${loud.lufs} LUFS (want ${TARGET.lufs} ± ${TARGET.lufsTol}): "motionframes render" normalises; re-run it`);
   if (!(loud.truePeak <= TARGET.truePeak)) issues.push(`true peak ${loud.truePeak} dBFS (want <= ${TARGET.truePeak})`);
 
   const md = [

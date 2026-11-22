@@ -1,6 +1,6 @@
 # Hooks, retention and the shape of a short people finish
 
-`toonshorts story <dir>` checks most of this automatically. The rules are the reasons behind its checks.
+`motionframes story <dir>` checks most of this automatically. The rules are the reasons behind its checks.
 
 ## The first 3 seconds decide everything
 
