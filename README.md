@@ -61,10 +61,11 @@ Then, in a new chat: *"Set up MotionFrames and make a test video."* The skill ru
 Terminal only, no agent:
 
 ```bash
-npx -y github:khadinakbarlabs/motionframes setup --test
+npx -y motionframes setup --test
 ```
 
-For a permanent `motionframes` command: `npm install -g github:khadinakbarlabs/motionframes`.
+(The same from GitHub: `npx -y github:khadinakbarlabs/motionframes setup --test`.) For a permanent
+`motionframes` command: `npm install -g motionframes`.
 
 `setup` checks Node 20+, FFmpeg and Python 3.10-3.13. It installs missing ones with Homebrew (macOS) or winget
 (Windows) and otherwise prints the exact command for your OS (`--no-install` only prints). Then it installs the

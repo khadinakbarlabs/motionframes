@@ -1,10 +1,46 @@
 {
   "name": "motionframes",
   "version": "0.4.0",
-  "description": "Animated vertical shorts from one spec file, rendered by HyperFrames.",
+  "description": "AI animation creator: animated videos from one spec file, timed to the voice, rendered locally with HyperFrames. One-command setup for Claude Code, Codex, Gemini CLI or any agent.",
   "type": "module",
   "license": "Apache-2.0",
-  "bin": { "motionframes": "engine/motionframes.mjs", "toonshorts": "engine/motionframes.mjs" },
-  "engines": { "node": ">=20" },
-  "repository": "github:khadinakbarlabs/motionframes"
+  "bin": {
+    "motionframes": "engine/motionframes.mjs",
+    "toonshorts": "engine/motionframes.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": "github:khadinakbarlabs/motionframes",
+  "files": [
+    "engine/",
+    "skills/",
+    "templates/",
+    "examples/",
+    ".claude-plugin/",
+    ".codex-plugin/",
+    ".agents/",
+    "gemini-extension.json",
+    "GEMINI.md",
+    "AGENTS.md",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "keywords": [
+    "animation",
+    "video",
+    "shorts",
+    "reels",
+    "tiktok",
+    "hyperframes",
+    "gsap",
+    "claude-code",
+    "codex",
+    "ai-agent"
+  ],
+  "homepage": "https://github.com/khadinakbarlabs/motionframes",
+  "bugs": "https://github.com/khadinakbarlabs/motionframes/issues",
+  "author": "Khadin Akbar (https://github.com/khadinakbarlabs)"
 }
