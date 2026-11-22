@@ -1,0 +1,61 @@
+<defs>
+  <radialGradient id="s1-glowg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F4B860" stop-opacity="0.85" /><stop offset="45%" stop-color="#F4B860" stop-opacity="0.22" /><stop offset="100%" stop-color="#F4B860" stop-opacity="0" /></radialGradient>
+  <linearGradient id="s1-soil" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1410" /><stop offset="100%" stop-color="#070605" /></linearGradient>
+  <linearGradient id="s1-ray" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#F4B860" stop-opacity="0.45" /><stop offset="100%" stop-color="#F4B860" stop-opacity="0" /></linearGradient>
+</defs>
+<rect x="0" y="0" width="1080" height="1920" fill="#050505" />
+<text id="s1-num" x="540" y="420" text-anchor="middle" font-family="IBM Plex Mono" font-size="96" font-weight="600" fill="#f2f2f2">1</text>
+<text x="540" y="470" text-anchor="middle" font-family="Inter" font-size="28" letter-spacing="8" fill="#777">DAYS</text>
+<g id="s1-rays" opacity="0">
+  <polygon points="600,1030 470,380 560,380" fill="url(#s1-ray)" />
+  <polygon points="600,1030 640,360 730,380" fill="url(#s1-ray)" />
+  <polygon points="600,1030 800,430 870,480" fill="url(#s1-ray)" />
+  <polygon points="600,1030 330,470 400,430" fill="url(#s1-ray)" />
+</g>
+<rect x="0" y="1040" width="1080" height="880" fill="url(#s1-soil)" />
+<line x1="0" y1="1040" x2="1080" y2="1040" stroke="#3a3128" stroke-width="3" />
+<g id="s1-roots" fill="none" stroke="#c9b79a" stroke-linecap="round" opacity="0.85">
+  <path id="s1-r1" d="M600 1050 C600 1120 590 1190 600 1260 C610 1330 595 1400 600 1470" stroke-width="7" />
+  <path id="s1-r2" d="M600 1120 C560 1160 500 1180 450 1240 C410 1290 380 1330 330 1350" stroke-width="5" />
+  <path id="s1-r3" d="M600 1150 C650 1190 710 1210 760 1270 C800 1320 830 1360 880 1380" stroke-width="5" />
+  <path id="s1-r4" d="M598 1260 C550 1300 520 1360 470 1420 C440 1460 400 1490 360 1520" stroke-width="4" />
+  <path id="s1-r5" d="M602 1300 C650 1340 690 1400 740 1450 C770 1480 810 1510 850 1540" stroke-width="4" />
+  <path id="s1-r6" d="M600 1400 C580 1460 560 1520 520 1580" stroke-width="3" />
+  <path id="s1-r7" d="M600 1420 C630 1480 660 1540 700 1600" stroke-width="3" />
+</g>
+<ellipse cx="600" cy="1046" rx="16" ry="9" fill="#8a6a45" />
+<g id="s1-glow" opacity="0"><circle cx="600" cy="840" r="330" fill="url(#s1-glowg)" /></g>
+<g id="s1-tree" opacity="0">
+  <path d="M600 1040 C598 980 604 930 600 860" stroke="#e9dcc3" stroke-width="12" fill="none" stroke-linecap="round" />
+  <path d="M600 930 C570 900 545 890 520 880" stroke="#e9dcc3" stroke-width="7" fill="none" stroke-linecap="round" />
+  <path d="M601 900 C630 870 655 862 682 850" stroke="#e9dcc3" stroke-width="7" fill="none" stroke-linecap="round" />
+  <ellipse cx="510" cy="868" rx="46" ry="22" fill="#F4B860" transform="rotate(-20 510 868)" />
+  <ellipse cx="694" cy="838" rx="50" ry="24" fill="#F4B860" transform="rotate(-15 694 838)" />
+  <ellipse cx="600" cy="836" rx="40" ry="30" fill="#F7C67A" />
+</g>
+<g id="s1-can">
+  <rig type="stick" id="s1-me" x="330" y="1040" scale="0.95" ink="#f2f2f2" shirt="#f2f2f2" />
+  <g id="s1-water" opacity="0"><path d="M470 760 C500 830 540 900 585 1030" stroke="#9ecbe6" stroke-width="5" stroke-dasharray="10 14" fill="none" opacity="0.8" /></g>
+</g>
+<script>
+  const turn = at("L3");
+  // watering: one pour per cue (0.5 s + 1.05 s each, 7 times), then he waits
+  for (let k = 0; k < 7; k++) {
+    const t = S.start + 0.5 + k * 1.05;
+    fx.show("#s1-water", t); fx.hide("#s1-water", t + 0.55);
+    fx.pose("s1-me", "reach", t - 0.1, 0.25); fx.pose("s1-me", "idle", t + 0.6, 0.3);
+  }
+  fx.pose("s1-me", "think", at("L2") + 0.2, 0.4);
+  // roots grow out of sight while the counter climbs
+  ["#s1-r1", "#s1-r2", "#s1-r3", "#s1-r4", "#s1-r5", "#s1-r6", "#s1-r7"].forEach((r, k) => {
+    tl.fromTo(r, { strokeDasharray: 700, strokeDashoffset: 700 }, { strokeDashoffset: 0, duration: 2.4, ease: "sine.out", immediateRender: false }, 1.0 + k * 0.95);
+    tl.set(r, { strokeDasharray: 700, strokeDashoffset: 700 }, 0);
+  });
+  fx.count("#s1-num", [[0.3, 1], [4.5, 22], [7.6, 60], [turn - 0.05, 60], [turn, 61]], { ease: "power1.in" });
+  fx.move("#s1-num", { fill: "#F4B860" }, turn, 0.25);
+  fx.glow("#s1-glow", turn, { dur: 1.2 });
+  fx.glow("#s1-rays", turn + 0.15, { dur: 1.4 });
+  fx.pop("#s1-tree", turn, { from: 0.2, dur: 0.6, origin: "50% 100%" });
+  fx.pose("s1-me", "cheer", turn + 0.15, 0.35);
+  fx.flicker("#s1-glow", turn + 1.3, S.end, { amt: 0.12 });
+</script>

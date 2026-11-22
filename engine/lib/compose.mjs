@@ -99,7 +99,7 @@ export function compose(model, { captions, sfxClips = [], music = "" }) {
   }
 
   const cap = captionMarkup(captions);
-  const voice = lines.map((l) =>
+  const voice = lines.filter((l) => l.audio).map((l) =>
     `      <audio id="vo-${l.id}" class="clip" src="${l.audio}" data-start="${l.start}" data-duration="${l.dur}" data-volume="${l.volume}" data-track-index="2"></audio>`
   ).join("\n");
 
@@ -156,7 +156,7 @@ export function compose(model, { captions, sfxClips = [], music = "" }) {
     <!-- built by motionframes from short.json: edit the spec and scenes/, then run "motionframes build" -->
     <script src="${GSAP}"></script>
     <style>
-      :root { --ink: ${palette.ink}; --paper: ${palette.paper}; --hot: ${palette.hot || "#ffc93c"}; --font-caption: "${font}", sans-serif; }
+      :root { --ink: ${palette.ink}; --paper: ${palette.paper}; --hot: ${palette.hot || "#ffc93c"}; --font-caption: "${font}", sans-serif; --font-card: "${spec.cardFont || font}", ${spec.cardFont && /mono/i.test(spec.cardFont) ? "monospace" : "sans-serif"}; }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: ${W}px; height: ${H}px; overflow: hidden; background: ${palette.bg}; }
       #root { position: relative; width: ${W}px; height: ${H}px; overflow: hidden; background: ${palette.bg}; }

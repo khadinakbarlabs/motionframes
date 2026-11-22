@@ -157,7 +157,7 @@ export function planCues(model, captions) {
     captions.filter((g) => snd.captionPops === "all" || g.hot).filter((g) => !busy(g.start))
       .forEach((g, i) => list.push({ t: g.start, sfx: i % 2 ? "bubble pop" : "pop", vol: 0.14, len: 0.3, align: "peak", auto: true }));
   }
-  for (const b of spec.beds || []) list.push({ bed: true, from: at(b.from ?? 0), to: at(b.to ?? model.duration), sfx: b.sfx, vol: b.vol ?? 0.1 });
+  for (const b of spec.beds || []) list.push({ bed: true, from: at(b.from ?? 0), to: at(b.to ?? model.duration), sfx: takes(b.sfx, 0), vol: b.vol ?? 0.1 });
   return list;
 }
 

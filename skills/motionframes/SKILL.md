@@ -72,5 +72,16 @@ than Kokoro. Only clone a voice the user owns or has permission to use: ask if t
 
 ## Styles
 
-`references/styles.md`: ink cartoon (bean rig), stickman explainer (stick rig), line-art, minimal shapes.
+`references/styles.md`: ink cartoon (bean rig), stickman explainer (stick rig), line-art, minimal shapes,
+count-up parable.
 Worked example: `examples/bridge-gaps/` (9 scenes, 64 s).
+
+## Formats
+
+- **Voiced story** (default): the loop above.
+- **Count-up parable** (`references/count-up.md`): silent, one continuous shot, a live counter as the hook
+  (`fx.count`), 2-5 text cards (`"voice": "none"`, `"captions": { "style": "card" }`), a stall before the payoff,
+  one warm light reveal (`fx.glow`), sound = soft bed + a hit per action + one big payoff hit. Plays in any
+  language. Pick it when the user wants viral motivation/habit/life-truth reels, "no voice", or a reference that is
+  a faceless counter animation. In step 1 write the counter (what is counted, start, stall, last value) and the
+  cards instead of voice lines; steps 2-6 are the same (`voice`/`words` skip silent lines).

@@ -26,7 +26,10 @@
              { "at": "s2+0.05", "sfx": ["footstep", "gravel step"], "every": 0.34, "count": 5, "vol": 0.3 } ],
   "beds":  [ { "sfx": "river", "from": "0", "to": "s5", "vol": 0.08 } ],
   "sound": { "cutWhoosh": true, "captionPops": "hot|all|none", "riser": "L3:buckle" },
-  "music": { "file": "assets/music.mp3", "vol": 0.14 }        // only if the user supplies it
+  "music": { "file": "assets/music.mp3", "vol": 0.14 },       // only if the user supplies it
+  // silent shorts (references/count-up.md): "voice": "none" (or a line's "silent": true) = no audio, the line is
+  // a card held "hold" s (default: 0.3 s a word + 0.9 s); "captions": { "style": "card", "position": 1260, "size": 44 };
+  // "format": "count-up" (story check for the counter format); "cardFont": "IBM Plex Mono"
 }
 ```
 
@@ -102,3 +105,5 @@ a depth, so camera moves give parallax. Mark your own layers with `data-depth="0
 | `kick(sel,t,amp)` / `flash(sel,t)` | decaying impact shake / flash |
 | `drift(sel,x0,x1,t0,t1)` / `grow(sel,t,dur,{axis,origin,from,to})` | drift / bars and fills |
 | `rng(seed)` / `smoother(p)` | seeded random / smootherstep |
+| `count(sel,[[t,v],...],{ease,fmt,prefix,suffix})` | live counter text (count-up format); equal neighbours = a stall |
+| `glow(sel,t,{dur,from})` / `flicker(sel,t0,t1,{amt})` | payoff light reveal / breathing light on a held frame |

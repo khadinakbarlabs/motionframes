@@ -39,7 +39,9 @@ export function mixPreview(dir, out = join(dir, "snaps", "mix-preview.wav")) {
 }
 
 export function qaVideo(dir, mp4) {
-  const vf = "blackdetect=d=0.1:pix_th=0.06,freezedetect=n=-60dB:d=0.4";
+  // the count-up format is a locked camera on near-black by design: only flag a picture that holds still 1.5 s+
+  let fmt = null; try { fmt = JSON.parse(readFileSync(join(dir, "short.json"), "utf8")).format; } catch {}
+  const vf = `blackdetect=d=0.1:pix_th=0.06,freezedetect=n=-60dB:d=${fmt === "count-up" ? 1.5 : 0.4}`;
   const r = spawnSync("ffmpeg", ["-hide_banner", "-nostats", "-i", mp4, "-vf", vf, "-af", "silencedetect=n=-50dB:d=" + TARGET.silence, "-f", "null", "-"], { encoding: "utf8", maxBuffer: 1 << 26 });
   const log = r.stderr || "";
   const black = [...log.matchAll(/black_start:([\d.]+) black_end:([\d.]+)/g)].map((m) => [+m[1], +m[2]]);

@@ -17,6 +17,11 @@ payoff line. 10-12 setups of 2-4 s each, each setup a new picture.
 Everyday object + "on purpose" hook → someone ignores the reason → it goes wrong → the real reason in one
 picture → callback joke.
 
+**Count-up parable (silent, 12-27 s, `references/count-up.md`)**
+Counter starts in frame 0 → the action repeats and the counter accelerates → setup card → stall one step before the
+end with a "But..." card (the hidden truth) → the last step + warm light + biggest hit → reframe card → payoff truth
+card held 2 s+. A truth about the viewer's life ("you"), not advice. 2-5 cards, under 10 words each.
+
 ## Rules
 
 - One idea per short. Cut every sentence that does not move the picture.

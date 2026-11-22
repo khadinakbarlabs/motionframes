@@ -22,6 +22,8 @@ export function probeDuration(file) {
   return d;
 }
 
+export const isSilent = (spec, l) => l.silent === true || ((spec.voice === "none" || spec.voice === false) && !l.audio);
+
 export const wordsPathFor = (audio) => audio.replace(/\.[a-z0-9]+$/i, "") + ".words.json";
 
 function validate(raw) {
@@ -58,6 +60,19 @@ export function loadModel(dir, { needWords = true } = {}) {
   let t = spec.lead;
   const warnings = [];
   const lines = spec.lines.map((l, i) => {
+    // silent card lines ("voice": "none" or a line's "silent": true): no audio, the text is read on screen.
+    // Hold = reading time (0.3 s a word + 0.9 s, min 1.6 s) unless the line sets "hold". Word times are spread
+    // evenly over the reading time so word anchors ("L2:crack") still work for scenes, cues and fx.
+    if (isSilent(spec, l)) {
+      const ws = l.text.split(/\s+/).filter(Boolean);
+      const read = ws.length * 0.3;
+      const dur = l.hold ?? Math.max(1.6, read + 0.9);
+      const start = r3(l.start ?? (i === 0 ? t : t + (l.gap ?? spec.gap)));
+      const step = Math.min(dur, Math.max(read, 0.3)) / Math.max(1, ws.length);
+      const words = ws.map((w, k) => ({ text: w, start: r3(start + k * step), end: r3(start + (k + 1) * step) }));
+      t = start + dur;
+      return { id: l.id, text: l.text, audio: null, silent: true, volume: 0, start, end: r3(start + dur), dur: r3(dur), words };
+    }
     if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio file yet: run "motionframes voice ${dir}"`);
     let audio = l.audio, wordsRel = wordsPathFor(l.audio);
     // "pace": shorten long pauses + speed up delivery (exact word remap); needs word timings first

@@ -1,0 +1,94 @@
+{
+  "title": "Day 61",
+  "format": "count-up",
+  "voice": "none",
+  "gap": 0.2,
+  "lead": 1.6,
+  "tail": 2.8,
+  "palette": {
+    "ink": "#050505",
+    "paper": "#f2f2f2",
+    "bg": "#050505",
+    "hot": "#F4B860"
+  },
+  "font": "Inter",
+  "cardFont": "IBM Plex Mono",
+  "captions": {
+    "style": "card",
+    "position": 580
+  },
+  "texture": {
+    "grain": 0.05,
+    "vignette": 0.45
+  },
+  "transition": "cut",
+  "cam": {
+    "type": "push",
+    "amt": 0.06
+  },
+  "lines": [
+    {
+      "id": "L1",
+      "text": "Nothing above the ground.",
+      "hold": 3.4
+    },
+    {
+      "id": "L2",
+      "text": "But under it, everything was growing.",
+      "hold": 3.2
+    },
+    {
+      "id": "L3",
+      "text": "Day 61 didn't grow the tree.",
+      "hold": 2.6
+    },
+    {
+      "id": "L4",
+      "text": "Every day before it did.",
+      "hot": true
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "at": "0",
+      "file": "s1.html"
+    }
+  ],
+  "beds": [
+    {
+      "sfx": "soft piano ambient",
+      "from": "0",
+      "to": "L2.end",
+      "vol": 0.16
+    },
+    {
+      "sfx": "ambient pad",
+      "from": "L3",
+      "vol": 0.2
+    }
+  ],
+  "cues": [
+    {
+      "at": "0.5",
+      "sfx": "water pour",
+      "every": 1.05,
+      "count": 7,
+      "vol": 0.3
+    },
+    {
+      "at": "L3",
+      "sfx": "deep impact boom",
+      "vol": 0.85
+    },
+    {
+      "at": "L3+0.05",
+      "sfx": "shimmer",
+      "vol": 0.45
+    }
+  ],
+  "sound": {
+    "cutWhoosh": false,
+    "captionPops": "none"
+  }
+}

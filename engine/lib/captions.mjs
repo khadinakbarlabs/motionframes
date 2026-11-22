@@ -10,9 +10,22 @@ const LEAN = new Set("a an the in on of to at by for from with into onto and or 
 const clean = (s) => s.replace(/[^\p{L}\p{N}%'+\- ]/gu, "").trim();
 const norm = (s) => clean(s).toLowerCase();
 
+// Card captions ("captions": { "style": "card" }, the count-up format): one calm sentence per line, in the
+// line's own case, held until the next line (or "hold" s), faded in with a small rise. Silent shorts use these.
+function cardGroups(model, c) {
+  const L = model.lines;
+  return L.map((l, i) => {
+    const next = L[i + 1]?.start ?? model.duration;
+    const end = Math.min(next - 0.06, l.start + (c.hold ?? 99));
+    return { start: Math.round(l.start * 1000) / 1000, end, dur: Math.max(0.4, Math.round((end - l.start) * 1000) / 1000),
+      text: l.card ?? l.text, hot: !!l.hot, card: true, top: l.top };
+  }).filter((g) => g.text);
+}
+
 export function captionGroups(model) {
   const c = model.spec.captions || {};
   if (c.off) return [];
+  if (c.style === "card") return cardGroups(model, c);
   const maxWords = c.words ?? 2, maxDur = c.max ?? 1.8;
   const hot = new Set((c.hot || []).map(norm));
   const replace = Object.entries(c.replace || {}).map(([k, v]) => [norm(k), v]);
@@ -97,6 +110,10 @@ function layoutHide(model) {
 // caption bands the layout step may move a caption to when it would cover a face or key art
 export function captionBands(spec) {
   const c = spec.captions || {};
+  if (c.style === "card") {
+    const top = typeof c.position === "number" ? c.position : c.position === "high" ? 330 : 1110;
+    return [...new Set([top, 1110, 1010, 330])];
+  }
   const high = c.position === "low" ? 1080 : typeof c.position === "number" ? c.position : 330;
   return [...new Set([high, 600, 1010, 330])];  // all inside the TikTok/Reels/Shorts safe area (y 288-1248)
 }
@@ -110,6 +127,15 @@ export function applyLayout(groups, layout) {
 
 export function captionCss(spec) {
   const c = spec.captions || {};
+  if (c.style === "card") {
+    const top = typeof c.position === "number" ? c.position : c.position === "high" ? 330 : 1110;  // inside the Reels/TikTok/Shorts safe area (y 288-1248)
+    return `
+      .cap { position: absolute; left: 0; right: 0; top: ${top}px; padding: 0 150px; display: flex; justify-content: center; text-align: center; }
+      .cap span { display: inline-block; max-width: 780px; font-family: var(--font-card, var(--font-caption)); font-size: ${c.size ?? 44}px;
+        line-height: 1.28; font-weight: 500; color: rgba(255,255,255,0.92); letter-spacing: 0.005em; text-wrap: balance; }
+      .cap .hot { color: var(--hot); }
+      .cap.low { padding: 0 290px 0 130px; }   /* below y 840 TikTok's buttons start at x 780 */`;
+  }
   const top = c.position === "low" ? 1080 : typeof c.position === "number" ? c.position : 330;
   return `
       .cap { position: absolute; left: 0; right: 0; top: ${top}px; padding: 0 200px 0 125px; display: flex; justify-content: center; text-align: center; }
@@ -131,6 +157,10 @@ export function captionMarkup(groups) {
   let h = 0;
   const js = groups.map((g, i) => {
     const sel = `#cap${i + 1} span`;
+    if (g.card) {
+      return `      tl.fromTo("${sel}", { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.38, ease: "power2.out", immediateRender: false }, ${g.start});\n` +
+        `      tl.to("${sel}", { opacity: 0, duration: 0.22, ease: "power1.in" }, ${Math.max(g.start + 0.4, g.start + g.dur - 0.22)});`;
+    }
     if (g.hot) {
       const tilt = h++ % 2 ? 3 : -3;
       return `      tl.fromTo("${sel}", { scale: 0.35, rotation: ${tilt * 3}, opacity: 0 }, { scale: 1, rotation: ${tilt}, opacity: 1, duration: 0.26, ease: "back.out(3.2)" }, ${g.start});`;

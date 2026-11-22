@@ -61,6 +61,40 @@ function makeFx(tl, opts) {
       tl.fromTo(sel, { scale: from, opacity: 0, transformOrigin: origin }, { scale: 1, opacity: 1, duration: dur, ease: "back.out(2.2)", immediateRender: false }, t);
       tl.set(sel, { opacity: 0 }, 0);
     },
+    // live counter (count-up format). keys = [[t, value], ...] in seconds; the number eases between keys
+    // (default "power1.in": slow start, fast finish). Keep two equal values in a row for the stall before the
+    // payoff. fmt: "comma" (268,435,456), "plain", or a function. A stalled number holds exactly.
+    count(sel, keys, { ease = "power1.in", fmt = "comma", prefix = "", suffix = "" } = {}) {
+      if (!keys || keys.length < 1) return;
+      const el = typeof document === "undefined" ? null : document.querySelector(sel);
+      const show = (v) => {
+        const n = Math.round(v);
+        const txt = typeof fmt === "function" ? fmt(n) : fmt === "comma" ? n.toLocaleString("en-US") : String(n);
+        if (el) el.textContent = prefix + txt + suffix;
+      };
+      const o = { v: keys[0][1] };
+      show(o.v);
+      tl.call(() => show(keys[0][1]), [], 0);
+      for (let k = 1; k < keys.length; k++) {
+        const [t0, v0] = keys[k - 1], [t1, v1] = keys[k];
+        if (v0 === v1) { tl.call(() => show(v1), [], t1); continue; }
+        tl.fromTo(o, { v: v0 }, { v: v1, duration: Math.max(F, t1 - t0), ease, immediateRender: false, onUpdate: () => show(o.v) }, t0);
+      }
+    },
+
+    // payoff light: fade + slight grow in (glow layers, god rays, a lit crack). Pair with a counter tint
+    // (fx.move("#c-num", { fill: "#F4B860" }, t, 0.3)) and the loudest hit of the short.
+    glow(sel, t, { dur = 0.9, from = 0.92, origin = "50% 50%", to = 1 } = {}) {
+      tl.set(sel, { opacity: 0 }, 0);
+      tl.fromTo(sel, { opacity: 0, scale: from, transformOrigin: origin }, { opacity: to, scale: 1, duration: dur, ease: "power2.out", immediateRender: false }, t);
+    },
+
+    // slow continuous breathing of a light (keeps a held payoff frame alive without loops)
+    flicker(sel, t0, t1, { amt = 0.12, period = 1.6, seed = 3 } = {}) {
+      const r = rng(seed); let t = t0, up = true;
+      while (t < t1) { const d = period * (0.7 + r() * 0.6); tl.to(sel, { opacity: up ? 1 : 1 - amt, duration: d / 2, ease: "sine.inOut" }, t); t += d / 2; up = !up; }
+    },
+
     out(sel, t, dur = 0.2) { tl.to(sel, { opacity: 0, scale: 0.85, duration: dur, ease: "power2.in" }, t); },
     show(sel, t) { tl.set(sel, { opacity: 1 }, t); },
     hide(sel, t) { tl.set(sel, { opacity: 0 }, t); },

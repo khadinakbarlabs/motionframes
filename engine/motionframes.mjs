@@ -20,7 +20,7 @@ import { join, resolve, dirname, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { tmpdir, homedir } from "node:os";
-import { loadModel, readSpec, wordsPathFor } from "./lib/spec.mjs";
+import { isSilent, loadModel, readSpec, wordsPathFor } from "./lib/spec.mjs";
 import { captionGroups, applyLayout } from "./lib/captions.mjs";
 import { planCues, placeCues, resolveSfx, readLock, intentsOf, musicClip, LIBRARY } from "./lib/sfx.mjs";
 import { compose } from "./lib/compose.mjs";
@@ -145,7 +145,8 @@ const commands = {
     const key = clone ? cloneKey(ref, clone) : `kokoro:${kokoro}:${speed}`;
     mkdirSync(join(dir, "assets"), { recursive: true });
     const ours = (l) => l.voiced || l.audio === `assets/vo-${l.id}.wav`;
-    const todo = spec.lines.filter((l) => flag("force", false) || !l.audio || !existsSync(join(dir, l.audio)) || (ours(l) && l.voiced !== key));
+    if (spec.voice === "none" || spec.voice === false) return "voice is \"none\": silent card short, nothing to voice";
+    const todo = spec.lines.filter((l) => !isSilent(spec, l)).filter((l) => flag("force", false) || !l.audio || !existsSync(join(dir, l.audio)) || (ours(l) && l.voiced !== key));
     if (!todo.length) return `${spec.lines.length} lines already have audio`;
     for (const l of todo) { const old = l.audio && join(dir, wordsPathFor(l.audio)); if (old && existsSync(old)) rmSync(old); }
     const audioOf = (l) => (l.audio && !ours(l) && !flag("force", false) ? l.audio : `assets/vo-${l.id}.wav`);
@@ -169,6 +170,7 @@ const commands = {
     const spec = readSpec(dir);
     let made = 0;
     for (const l of spec.lines) {
+      if (isSilent(spec, l)) continue;
       if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio: run "motionframes voice ${rel(dir)}" or set "audio"`);
       const wp = join(dir, wordsPathFor(l.audio));
       if (existsSync(wp) && !flag("force", false)) continue;
