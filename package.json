@@ -1,6 +1,6 @@
 {
   "name": "motionframes",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "AI animation creator: animated videos from one spec file, timed to the voice, rendered locally with HyperFrames. One-command setup for Claude Code, Codex, Gemini CLI or any agent.",
   "type": "module",
   "license": "Apache-2.0",

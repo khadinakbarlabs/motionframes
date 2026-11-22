@@ -15,6 +15,12 @@ skill's plugin root (two folders up from this file). First time on this computer
 
 ## The loop
 
+0. **Ask for a reference, once.** Before anything else ask: "Do you have a reference video you like? Paste a
+   link or drop the file, or say no." If no, go to step 1. If yes:
+   `motionframes reference <dir> <link-or-file>` (YouTube and most public links; if a link cannot be fetched,
+   ask for the saved file). Read `<dir>/reference/reference.md` and LOOK at `<dir>/reference/sheet.jpg`.
+   Tell the user in three lines what you will match (length, shot rhythm, pace, hook shape, caption style).
+   Borrow the format only: original story, original character, original art, your own words.
 1. **Story and hook first** (`references/hooks.md`, `references/story.md`). Write the picture hook, the
    text hook and a spoken hook of 10 words or fewer, then the beats (open loop, turn, proof, re-hook,
    loop ending). 90-160 words. Split into voice lines L1..Ln at beat changes. Plan one shot per 2-4 s.
@@ -37,7 +43,7 @@ skill's plugin root (two folders up from this file). First time on this computer
    QA; about 2 minutes for 60 s). QA failures stop the run with the reason.
 6. Give the user `renders/<dir>.mp4` and `SOUND-CREDITS.md` (CC BY sounds must be credited in the description).
 
-Single steps exist for debugging: `voice words sfx build check preview stills mix render qa`.
+Single steps exist for debugging: `reference voice words sfx build check preview stills mix render qa`.
 
 **The user's own voice** ("use my voice, the sample is my-voice.wav"): put the sample in the project folder
 and set `"voice": { "clone": "my-voice.wav" }` in `short.json`; `go` then speaks every line in that voice

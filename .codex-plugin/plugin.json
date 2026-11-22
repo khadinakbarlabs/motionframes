@@ -1,6 +1,6 @@
 {
   "name": "motionframes",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "AI animation creator: animated videos from one spec file. Claude or Codex writes the story and scene art; MotionFrames times every scene, caption, mouth shape and sound effect to the voice and renders with HyperFrames.",
   "author": { "name": "Khadin Akbar", "url": "https://github.com/khadinakbarlabs" },
   "homepage": "https://github.com/khadinakbarlabs/motionframes",

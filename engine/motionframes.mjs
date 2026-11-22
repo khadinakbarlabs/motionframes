@@ -5,6 +5,7 @@
 //   motionframes story   <dir>                          score the script + shot plan: hook, turn, loop ending, pacing, shots
 //   motionframes layout  <dir>                          headless check: captions over faces/art (auto-moved), overlaps, cut-offs
 //   motionframes preview <dir>                          build + one still per scene -> snaps/preview/sheet.jpg
+//   motionframes reference <dir> <link-or-file>        study a reference video: shot rhythm, pace, hook, stills (format only)
 //   motionframes init    <dir> [--rig bean|stick]        scaffold short.json + scenes/
 //   motionframes setup   [--agent claude|codex|gemini|other] [--test] [--clone]   one-time: tools, free voice, plugin, test
 //   motionframes doctor                                 check node, ffmpeg, HyperFrames, voice, sound library
@@ -25,6 +26,7 @@ import { planCues, placeCues, resolveSfx, readLock, intentsOf, musicClip, LIBRAR
 import { compose } from "./lib/compose.mjs";
 import { storyReport } from "./lib/story.mjs";
 import { mixPreview, qaVideo, normalize } from "./lib/qa.mjs";
+import { reference as studyReference } from "./lib/reference.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const [cmd, ...argv] = process.argv.slice(2);
@@ -334,12 +336,17 @@ const commands = {
     return `finished in ${secs(Date.now() - t0)}${flag("no-render", false) ? " (no render: look at the preview, then run go again without --no-render)" : ""}`;
   },
 
+  reference(dir) {
+    mkdirSync(dir, { recursive: true });
+    return studyReference(dir, rest.find((a) => !a.startsWith("--")), { hf, log, VPY });
+  },
+
   // kept for older notes: everything except render
   make(dir) { rest.push("--no-render"); return commands.go(dir); },
 };
 
 if (!commands[cmd] || !dirArg) {
-  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 13).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
+  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 14).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
   process.exit(cmd ? 1 : 0);
 }
 try {

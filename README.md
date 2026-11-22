@@ -85,6 +85,10 @@ The best ideas from five open-source animation projects, merged into one free pi
 
 ## What is automatic
 
+- **Reference study** (`motionframes reference <dir> <link-or-file>`): the assistant asks once whether you
+  have a reference video. Give a link or a file and it reads the length, the shot rhythm, the speaking pace
+  and the opening line, and makes a sheet of stills to look at. It borrows the format only: the story, the
+  character and the art stay original.
 - **Story doctor** (`motionframes story`): scores the script and shot plan on what keeps people watching:
   hook length and trigger, on-screen hook text, the turn, a concrete number, a loop ending, length, voice
   pace, shot length (jump cuts count) and the longest stretch with nothing new on screen.

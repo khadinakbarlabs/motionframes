@@ -116,7 +116,7 @@ export async function setup({ hf, log, flag, rest, commands, VENV, VPY, root }) 
     log(`  installing the free Kokoro voice into ${VENV} (one time) ...`);
     mkdirSync(VENV, { recursive: true });
     if (run(py.cmd, [...py.pre, "-m", "venv", VENV], { stdio: "inherit" }).status !== 0) throw new Error(`could not create a Python venv: ${manual("python")}`);
-    if (run(VPY, ["-m", "pip", "install", "-q", "--disable-pip-version-check", "kokoro-onnx", "soundfile"], { stdio: "inherit" }).status !== 0) throw new Error("pip could not install kokoro-onnx: check the network, then run setup again");
+    if (run(VPY, ["-m", "pip", "install", "-q", "--disable-pip-version-check", "kokoro-onnx", "soundfile", "yt-dlp"], { stdio: "inherit" }).status !== 0) throw new Error("pip could not install kokoro-onnx: check the network, then run setup again");
     log("  ok   Kokoro voice installed");
   }
 
