@@ -9,6 +9,7 @@ character sheets or fonts were copied unless noted. Each MIT licence is reproduc
 | [JDhruv14/line-art-animation](https://github.com/JDhruv14/line-art-animation) | MIT | Planted-foot walk cycle, idle breathing, spring secondary motion, two-stroke limbs |
 | [artemnovitckii/claude-animation-skills](https://github.com/artemnovitckii/claude-animation-skills) | MIT | Stick-figure explainer script shape, setups timed in voice seconds, 1-2 word captions, SFX gain, Instagram safe area |
 | [mromidev/claude-animated-shorts](https://github.com/mromidev/claude-animated-shorts) | MIT | Story beat formula, reactions landing before the word, smootherstep camera, hold creep, impact kicks, automated QA |
+| [resemble-ai/chatterbox](https://github.com/resemble-ai/chatterbox) | MIT | Optional voice clone. Installed from PyPI into its own venv on first use; not bundled |
 | [remotion-dev/skills](https://github.com/remotion-dev/skills) | none stated | General ideas only (frame-driven animation, captions inside their sequence, margins); nothing copied, all text rewritten |
 
 ## line-art-animation

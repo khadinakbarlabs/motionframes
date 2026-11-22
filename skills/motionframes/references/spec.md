@@ -6,6 +6,8 @@
 {
   "title": "Why bridges have gaps",
   "voice": "am_michael",                      // Kokoro voice for "motionframes voice" (af_heart, bm_george, ...)
+  //   or "voice": { "clone": "my-voice.wav", "exaggeration": 0.5 }   free local clone (Chatterbox) of an 8-30 s sample;
+  //   exaggeration 0.25 calm .. 1.0 dramatic. Changing the voice re-voices generated lines; recorded audio is kept.
   "fps": 30, "lead": 0.3, "gap": 0.3, "tail": 1.0,   // defaults; gap = pause between lines
   "palette": { "ink": "#0f1220", "paper": "#f3eadb", "bg": "#0f1220", "hot": "#ffc93c" },
   "font": "Archivo Black",

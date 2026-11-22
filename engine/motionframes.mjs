@@ -6,13 +6,14 @@
 //   motionframes layout  <dir>                          headless check: captions over faces/art (auto-moved), overlaps, cut-offs
 //   motionframes preview <dir>                          build + one still per scene -> snaps/preview/sheet.jpg
 //   motionframes init    <dir> [--rig bean|stick]        scaffold short.json + scenes/
-//   motionframes setup   [--agent claude|codex|gemini|other] [--test]   one-time: tools, free voice, agent plugin, test short
+//   motionframes setup   [--agent claude|codex|gemini|other] [--test] [--clone]   one-time: tools, free voice, plugin, test
 //   motionframes doctor                                 check node, ffmpeg, HyperFrames, voice, sound library
 //   single steps: voice [--voice am_michael --speed 1 --force] | words [--force] | sfx | build | check
 //                 stills [--at 1,5,9] | mix | render [--draft] | qa <file.mp4>
 import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, cpSync, rmSync, readdirSync } from "node:fs";
 import { env, cacheDir, HF, hfArgs, cleanNpxEnv } from "./lib/paths.mjs";
 import { setup as runSetup, manual } from "./lib/setup.mjs";
+import { installClone, cloneInstalled, checkSample, cloneKey, cloneLines, CLONE_VENV } from "./lib/clone.mjs";
 const require_fs = { readdirSync };
 import { join, resolve, dirname, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -114,6 +115,7 @@ const commands = {
     let ver = ""; try { ver = hf(["--version"]).trim().split("\n").pop(); } catch (e) { ver = ""; }
     row(!!ver, `HyperFrames ${ver || HF}`, "needs network once for npx");
     row(existsSync(VPY), "Kokoro voice", "motionframes setup");
+    log(`  ${cloneInstalled() ? "ok  " : "opt "} voice clone (Chatterbox)${cloneInstalled() ? `: ${CLONE_VENV}` : ": not installed, added on first use or with \"motionframes setup --clone\""}`);
     let n = 0; try { n = Object.keys(JSON.parse(readFileSync(join(LIBRARY, "index.json"), "utf8"))).length; } catch {}
     row(true, `sound library: ${n} sounds in ${LIBRARY}`);
     if (ENV.MOTIONFRAMES_NPM_FALLBACK) row(true, `npm cache: using ${ENV.npm_config_cache} (~/.npm is read-only here)`);
@@ -128,22 +130,37 @@ const commands = {
     return `scaffolded ${rel(dir)}: edit short.json (lines + scenes) and scenes/*.html, then "motionframes go ${rel(dir)}"`;
   },
 
-  voice(dir) {
+  // Kokoro by default ("voice": "am_michael"); a free local clone with "voice": { "clone": "my-voice.wav" }.
+  // Each generated line remembers which voice made it, so changing the voice re-voices those lines (and their
+  // word timings). Audio you recorded yourself is never replaced.
+  async voice(dir) {
     const spec = readSpec(dir);
-    const voice = flag("voice", spec.voice || "am_michael"), speed = flag("speed", spec.speed || 1);
+    const v = spec.voice;
+    const clone = v && typeof v === "object" && v.clone ? v : null;
+    const kokoro = String(flag("voice", typeof v === "string" ? v : (v && v.kokoro) || "am_michael"));
+    const speed = flag("speed", spec.speed || 1);
+    const ref = clone ? checkSample(dir, clone.clone) : null;
+    const key = clone ? cloneKey(ref, clone) : `kokoro:${kokoro}:${speed}`;
     mkdirSync(join(dir, "assets"), { recursive: true });
-    let made = 0;
-    const lines = spec.lines.map((l) => {
-      if (l.audio && existsSync(join(dir, l.audio)) && !flag("force", false)) return l;
-      const audio = l.audio || `assets/vo-${l.id}.wav`;
-      log(`  voicing ${l.id} (${voice}): "${l.text.slice(0, 50)}${l.text.length > 50 ? "..." : ""}"`);
-      try { hf(["tts", l.text, "--voice", String(voice), "--speed", String(speed), "-o", join(dir, audio)]); }
-      catch (e) { throw new Error(`voice failed for ${l.id}: ${e.message}\n  First time? Run "motionframes setup" once, or record your own lines and set "audio".`); }
-      made++;
-      return { ...l, audio };
-    });
-    writeSpec(dir, { lines });
-    return made ? `${made} line(s) voiced` : `${lines.length} lines already have audio`;
+    const ours = (l) => l.voiced || l.audio === `assets/vo-${l.id}.wav`;
+    const todo = spec.lines.filter((l) => flag("force", false) || !l.audio || !existsSync(join(dir, l.audio)) || (ours(l) && l.voiced !== key));
+    if (!todo.length) return `${spec.lines.length} lines already have audio`;
+    for (const l of todo) { const old = l.audio && join(dir, wordsPathFor(l.audio)); if (old && existsSync(old)) rmSync(old); }
+    const audioOf = (l) => (l.audio && !ours(l) && !flag("force", false) ? l.audio : `assets/vo-${l.id}.wav`);
+    if (clone) {
+      installClone(log);
+      log(`  voicing ${todo.length} line(s) with your cloned voice (${rel(ref)}): the first run downloads the model`);
+      await cloneLines(ref, todo.map((l) => ({ id: l.id, text: l.text, out: resolve(dir, audioOf(l)) })), { exaggeration: clone.exaggeration ?? 0.5, log });
+    } else {
+      for (const l of todo) {
+        log(`  voicing ${l.id} (${kokoro}): "${l.text.slice(0, 50)}${l.text.length > 50 ? "..." : ""}"`);
+        try { hf(["tts", l.text, "--voice", kokoro, "--speed", String(speed), "-o", join(dir, audioOf(l))]); }
+        catch (e) { throw new Error(`voice failed for ${l.id}: ${e.message}\n  First time? Run "motionframes setup" once, or record your own lines and set "audio".`); }
+      }
+    }
+    const done = new Set(todo.map((l) => l.id));
+    writeSpec(dir, { lines: spec.lines.map((l) => (done.has(l.id) ? { ...l, audio: audioOf(l), voiced: key } : l)) });
+    return `${todo.length} line(s) voiced${clone ? " with the cloned voice" : ""}`;
   },
 
   words(dir) {

@@ -9,3 +9,5 @@ examples/*/index.html
 examples/*/sfx.lock.json
 examples/*/SOUND-CREDITS.md
 examples/*/qa-report.md
+__pycache__/
+*.pyc

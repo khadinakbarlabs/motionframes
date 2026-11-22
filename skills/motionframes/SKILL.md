@@ -39,6 +39,12 @@ skill's plugin root (two folders up from this file). First time on this computer
 
 Single steps exist for debugging: `voice words sfx build check preview stills mix render qa`.
 
+**The user's own voice** ("use my voice, the sample is my-voice.wav"): put the sample in the project folder
+and set `"voice": { "clone": "my-voice.wav" }` in `short.json`; `go` then speaks every line in that voice
+(free, local, Chatterbox). The sample must be 8-30 s of one person speaking clearly, no music. The first run
+installs the clone engine and downloads its model (about 1-2 GB, several minutes) and each line takes longer
+than Kokoro. Only clone a voice the user owns or has permission to use: ask if that is not clear.
+
 ## Non-negotiables
 
 - Frame 0 is already the hook picture. No title card, no fade from black.

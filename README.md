@@ -96,6 +96,11 @@ The best ideas from five open-source animation projects, merged into one free pi
   a scene, captions that never ride into the next shot, and `pace` to tighten a slow voice (pauses
   shortened, delivery sped up, every word timing remapped).
 
+- **Your own voice, free and local**: `"voice": { "clone": "my-voice.wav" }` in `short.json` speaks every line in
+  the voice of an 8-30 s sample, using [Chatterbox](https://github.com/resemble-ai/chatterbox) (MIT). It is
+  installed only when a spec asks for it (or `motionframes setup --clone`): about 1-2 GB with its model, and
+  slower than the default Kokoro voice. Chatterbox adds an inaudible watermark to what it generates. Only clone
+  a voice you own or have permission to use.
 - Voice lines are measured and laid end to end (0.3 s gaps, no dead air). Word timings from local whisper.
   Scenes, actions and sounds anchor to **words**: `"at": "L3:pushes-0.2"`.
 - **Characters that act**: the `bean` rig (2.5D ink cartoon) has outlined limbs with knees and elbows, hands,

@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, cpSync, readdirSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { homedir, tmpdir } from "node:os";
 import { join, resolve, sep, basename } from "node:path";
+import { installClone, cloneLines } from "./clone.mjs";
 
 const WIN = process.platform === "win32";
 const MAC = process.platform === "darwin";
@@ -132,6 +133,14 @@ export async function setup({ hf, log, flag, rest, commands, VENV, VPY, root }) 
   hf(["browser", "ensure"]);
   log("  ok   headless Chrome for rendering");
   rmSync(warm, { recursive: true, force: true });
+
+  // 5b. Optional free voice clone (Chatterbox): only with --clone, so the default setup stays small
+  if (flag("clone", false)) {
+    installClone(log);
+    log("  loading the voice-clone model (first run downloads it) ...");
+    await cloneLines("", [], { log });
+    log("  ok   voice clone ready: set \"voice\": { \"clone\": \"my-voice.wav\" } in short.json");
+  }
 
   // 6. Stable copy (when run through npx) + the agent's plugin
   const home = stableHome(root, log);
