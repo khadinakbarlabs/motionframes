@@ -47,5 +47,9 @@
   "sound": {
     "cutWhoosh": true,
     "captionPops": "hot"
+  },
+  "hook": {
+    "text": "YOUR PHONE CAN *HEAR* YOU?",
+    "until": "L1.end"
   }
 }

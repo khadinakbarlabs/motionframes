@@ -19,7 +19,7 @@
   <text x="660" y="1070" transform="rotate(-24 660 1070)" text-anchor="middle" font-family="Archivo Black" font-size="34" fill="#0f1220">FILL</text>
 </g>
 <path id="s4-pour" d="M610 1100 Q560 1170 545 1260" stroke="#9c7f5e" stroke-width="22" stroke-linecap="round" fill="none" opacity="0" />
-<rig type="bean" id="pip4" x="350" y="1262" scale="1.15" shirt="#2ec4b6" face="thinking" pose="think" />
+<rig type="bean" id="pip4" x="350" y="1262" scale="1.05" shirt="#2ec4b6" face="thinking" pose="think" />
 <script>
   fx.nod("pip4", at("L2:good"), 2);
   fx.face("pip4", "happy", at("L2:He#2") - 0.3);
@@ -31,5 +31,5 @@
   fx.face("pip4", "proud", at("L2:filled") + 0.2);
   fx.hop("pip4", at("L2:filled") + 0.45, 70);
   fx.pose("pip4", "cheer", at("L2:filled") + 0.4);
-  fx.cam("#s4-cam", { scale: 1.2 }, at("L2:filled") - 0.4, 0.7, "470 1000");
+  fx.cam("#s4-cam", { scale: 1.2 }, at("L2:filled") - 0.4, 0.7, "470 700");
 </script>

@@ -13,7 +13,7 @@
       <path d="M-20 -214 Q0 -222 20 -214 L16 -150 Q0 -144 -16 -150 Z" fill="{{shirt}}" stroke-width="6" />
       <g id="{{id}}-armR"><circle cx="0" cy="-205" r="95" fill="none" stroke="none" /><path d="M0 -205 Q30 -170 46 -130" stroke-width="10" /><circle cx="46" cy="-128" r="6" fill="{{ink}}" stroke="none" /><g id="{{id}}-prop" transform="translate(46 -128)"></g></g>
       <g id="{{id}}-headbob"><g id="{{id}}-head"><circle cx="0" cy="-222" r="125" fill="none" stroke="none" />
-        <ellipse cx="0" cy="-280" rx="56" ry="60" fill="#ffffff" stroke-width="6" />
+        <ellipse class="ts-face" cx="0" cy="-280" rx="56" ry="60" fill="#ffffff" stroke-width="6" />
         <g id="{{id}}-brows" stroke-width="5"><path d="M-30 -306 q10 -6 20 0" /><path d="M12 -306 q10 -6 20 0" /></g>
         <g id="{{id}}-eyes" fill="{{ink}}" stroke="none"><ellipse cx="-18" cy="-284" rx="7" ry="9" /><ellipse cx="22" cy="-284" rx="7" ry="9" /></g>
         <path id="{{id}}-mouth" d="M-8 -252 q10 8 20 0" stroke-width="5" />

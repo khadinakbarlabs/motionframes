@@ -18,7 +18,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { captionCss, captionMarkup } from "./captions.mjs";
+import { captionCss, captionMarkup, captionBands } from "./captions.mjs";
 import { expandBackdrops } from "./backdrops.mjs";
 
 const ENGINE = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -112,12 +112,27 @@ export function compose(model, { captions, sfxClips = [], music = "" }) {
     if (s.creep !== undefined && s.cam === undefined) cam = s.creep === 1 ? "still" : { type: "push", amt: s.creep - 1 };
     if (cam === "auto") cam = AUTO_CAM[i % AUTO_CAM.length];
     const mv = cam === "none" ? "" : `      fx.sceneMove("${s.id}", ${s.start}, ${s.end}, ${JSON.stringify(cam)}, ${JSON.stringify(layers)});\n`;
+    // jump cuts: instant reframes of the scene on a word ("jumps": [{ "at": "L3:But", "scale": 1.25, "origin": "560 1450" }])
+    const jumps = (s.jumps || []).map((j, k) => {
+      const J = typeof j === "string" ? { at: j, scale: k % 2 ? 1 : 1.2 } : j;
+      return `      tl.set("#${s.id}", { scale: ${J.scale ?? 1.2}, x: ${J.x ?? 0}, y: ${J.y ?? 0}, svgOrigin: "${J.origin || `${W / 2} ${H / 2}`}", smoothOrigin: false }, ${model.at(J.at)});\n`;
+    }).join("") + ((s.jumps || []).length ? `      tl.set("#${s.id}", { scale: 1, x: 0, y: 0 }, ${s.end});\n` : "");
     const life = rigs.filter((r) => r.life !== "off").map((r, k) =>
       `        fx.alive("${r.id}", S.start, S.end, { seed: ${i * 10 + k + 1}, talks: ${JSON.stringify((r.talks || "").split(",").map((x) => x.trim()).filter(Boolean))}, face: ${JSON.stringify(r.face || null)}, pose: ${JSON.stringify(r.pose || null)} });`
     ).join("\n");
-    return `      // ---------- ${s.id} (${s.file}) ${s.start}s - ${s.end}s ----------\n${sw}${mv}` +
+    return `      // ---------- ${s.id} (${s.file}) ${s.start}s - ${s.end}s ----------\n${sw}${mv}${jumps}` +
       `      (function (tl, at, fx, S, L) {\n${bdJs ? indent(bdJs.trim(), 2) + "\n" : ""}${indent(code.trim(), 8)}\n${life ? life + "\n" : ""}      })(tl, at, fx, SCENES_BY_ID["${s.id}"], LINES_BY_ID);`;
   }).join("\n\n");
+
+  // on-screen hook text from frame 0 ("hook": { "text": "WHY BRIDGES HAVE *GAPS*", "until": "L1.end" })
+  const hook = spec.hook && spec.hook.text ? spec.hook : null;
+  const hookEnd = hook ? Math.min(DUR, model.at(hook.until || "L1.end") + 0.15) : 0;
+  const hookHtml = hook ? `      <div id="ts-hook" class="clip cap hook" data-start="0" data-duration="${hookEnd.toFixed(3)}" data-track-index="1" data-track-kind="captions"><span>${String(hook.text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\*([^*]+)\*/g, '<b class="hot">$1</b>')}</span></div>` : "";
+  const hookJs = hook ? `      tl.fromTo("#ts-hook span", { scale: 1.12 }, { scale: 1, duration: 0.35, ease: "power3.out" }, 0);\n      tl.to("#ts-hook span", { scale: 0.6, opacity: 0, duration: 0.14, ease: "power2.in" }, ${(hookEnd - 0.14).toFixed(3)});` : "";
+  // hot words punch the whole picture in a touch: a pattern interrupt on the words that matter
+  const cuts = scenes.slice(1).map((s) => s.start);
+  const punchJs = (spec.captions || {}).punch === false ? "" : captions.filter((g) => g.hot && g.start > hookEnd && !cuts.some((c) => Math.abs(c - g.start) < 0.45))
+    .map((g) => `      fx.punch("#ts-punch", ${g.start}, { amt: 0.045, hold: 0.55, origin: "${W / 2} ${Math.round(H * 0.5)}" });`).join("\n");
 
   const lean = lines.map(({ id, start, end, words }) => ({ id, start, end, words }));
   const scn = scenes.map(({ id, start, end }) => ({ id, start, end }));
@@ -155,10 +170,13 @@ ${spec.css ? indent(spec.css, 6) : ""}
     <div id="root" data-composition-id="main" data-start="0" data-duration="${DUR}" data-width="${W}" data-height="${H}" data-fps="${fps}">
       <div id="stage" class="clip" data-start="0" data-duration="${DUR}" data-track-index="0" data-track-kind="graphics" data-layout-allow-overflow data-layout-allow-overlap>
         <svg id="stage-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-${indent(svgBody, 10)}
+<g id="ts-punch">
+${indent(svgBody, 12)}
+</g>
 ${spec.texture === false ? "" : indent(textureOverlay(spec.texture || {}), 10)}
         </svg>
       </div>
+${hookHtml}
 ${cap.html}
 ${voice}
 ${music}
@@ -168,6 +186,7 @@ ${sfxClips.join("\n")}
       window.__timelines = window.__timelines || {};
 ${indent(runtime("anchor.js"), 6)}
 ${indent(runtime("fx.js"), 6)}
+${indent(runtime("layout.js"), 6)}
       const LINES = ${JSON.stringify(lean)};
       const SCENES = ${JSON.stringify(scn)};
       const LINES_BY_ID = Object.fromEntries(LINES.map((l) => [l.id, l]));
@@ -181,10 +200,13 @@ ${sceneJs}
 
       // ---------- captions ----------
 ${cap.js}
+${hookJs}
+${punchJs}
 
       tl.set({}, {}, DUR);
       window.__timelines["main"] = tl;
       tl.seek(0);
+      if (/ts-audit/.test(location.search)) window.addEventListener("load", () => runLayoutAudit(tl, { width: ${W}, height: ${H}, duration: DUR, bands: ${JSON.stringify(captionBands(spec))}, scenes: ${JSON.stringify(scenes.map((s) => ({ start: s.start, end: s.end })))}, cuts: ${JSON.stringify(scenes.flatMap((s) => [s.start, ...(s.jumps || []).map((j) => model.at(typeof j === "string" ? j : j.at))]))} }));
     </script>
   </body>
 </html>

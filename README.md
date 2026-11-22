@@ -16,6 +16,17 @@ The best ideas from five open-source animation projects, merged into one free pi
 
 ## What is automatic
 
+- **Story doctor** (`toonshorts story`): scores the script and shot plan on what keeps people watching:
+  hook length and trigger, on-screen hook text, the turn, a concrete number, a loop ending, length, voice
+  pace, shot length (jump cuts count) and the longest stretch with nothing new on screen.
+- **Stable layout** (`toonshorts layout`): opens the short in headless Chrome, steps through it every 0.2 s,
+  picks one caption band per scene that stays clear of faces and key art, drops captions that repeat a label
+  already on screen, and flags text on text, art cut off by the frame, and labels outside the area TikTok,
+  Reels and Shorts all keep clear of their buttons.
+- **Hooks and pacing**: an on-screen hook from frame 0, hot words that punch the picture in, jump cuts inside
+  a scene, captions that never ride into the next shot, and `pace` to tighten a slow voice (pauses
+  shortened, delivery sped up, every word timing remapped).
+
 - Voice lines are measured and laid end to end (0.3 s gaps, no dead air). Word timings from local whisper.
   Scenes, actions and sounds anchor to **words**: `"at": "L3:pushes-0.2"`.
 - **Characters that act**: the `bean` rig (2.5D ink cartoon) has outlined limbs with knees and elbows, hands,
@@ -74,6 +85,8 @@ node engine/toonshorts.mjs go my-short
 | command | does |
 |---|---|
 | `go <dir> [--no-render] [--draft]` | everything, with progress and a time per step |
+| `story <dir>` | hook / turn / loop / pace / shot checks |
+| `layout <dir>` | headless layout pass: caption bands, overlaps, cut-offs, safe area |
 | `preview <dir>` | build + one still per scene -> `snaps/preview/sheet.jpg` |
 | `doctor .` | check node, ffmpeg, HyperFrames, voice and sound library |
 | `setup .` | one-time install of the free local voice |

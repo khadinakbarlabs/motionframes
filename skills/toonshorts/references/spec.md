@@ -9,13 +9,16 @@
   "fps": 30, "lead": 0.3, "gap": 0.3, "tail": 1.0,   // defaults; gap = pause between lines
   "palette": { "ink": "#0f1220", "paper": "#f3eadb", "bg": "#0f1220", "hot": "#ffc93c" },
   "font": "Archivo Black",
+  "hook": { "text": "WHY DO BRIDGES HAVE *GAPS*?", "until": "L1.end" },   // on-screen hook from frame 0
+  "pace": { "speed": 1.1, "maxPause": 0.28 },  // tighten slow voice (exact word remap); per line too: lines[i].pace
   "transition": "auto",                       // default for scenes without "in"
   "cam": "auto",                              // default scene camera move
   "lines": [ { "id": "L1", "text": "...", "audio": "assets/vo-L1.mp3" } ],   // audio optional until "voice"
   "scenes": [ { "id": "s2", "at": "L2-0.1", "file": "s2-pip.html",
-                "in": "whip", "cam": "still", "irisAt": "540 1000" } ],
+                "in": "whip", "cam": "still", "irisAt": "540 1000",
+                "jumps": [ { "at": "L3:But-0.05", "scale": 1.15, "origin": "470 1500" }, { "at": "L3:5", "scale": 1 } ] } ],
   "captions": { "words": 2, "hot": ["gaps"], "replace": { "5 centimeters": "+5 CM" },
-                "position": "high|low|<px>", "case": "upper|lower", "size": 92, "off": false,
+                "position": "high|low|<px>", "case": "upper|lower", "size": 92, "off": false, "punch": true,
                 "groups": [["L1:gaps", "GAPS", true]] },              // groups = manual list, overrides auto
   "cues":  [ { "at": "L2:filled", "sfx": "sand pour", "vol": 0.35, "align": "peak|onset", "len": 1.2 },
              { "at": "s2+0.05", "sfx": ["footstep", "gravel step"], "every": 0.34, "count": 5, "vol": 0.3 } ],
@@ -28,6 +31,12 @@
 **`in`** (transition into the scene): `whip` / `whip-right` (fast slide with motion blur, new beat),
 `push` (zoom through, going deeper), `iris` (circle opens at `irisAt`, new chapter or the ending),
 `fade` (time passing), `cut`, `auto` (alternates whip/push). Sound follows the move automatically.
+
+**`jumps`**: instant reframes of the scene on a word (jump cuts): `scale`, `origin`, `x`, `y`. Use them to cut
+a long explainer into 2-4 s shots, or `{ "at": "s8", "y": 150 }` to shift a whole scene's framing.
+
+**Layout**: `toonshorts layout` writes `layout.json` (the caption band chosen per caption) and
+`layout-report.json`; the build reads `layout.json`. Delete it to start over.
 
 **`cam`** (the scene's own slow move, with parallax on every `data-depth` layer): `push`, `pull`,
 `pan-left`, `pan-right`, `rise`, `still`, `none`, `auto`, or `{ "type": "push", "amt": 0.1 }`.

@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import { makeAnchor } from "../runtime/anchor.js";
+import { paceLine } from "./pace.mjs";
 
 export const DEFAULTS = {
   width: 1080, height: 1920, fps: 30,
@@ -58,9 +59,15 @@ export function loadModel(dir, { needWords = true } = {}) {
   const warnings = [];
   const lines = spec.lines.map((l, i) => {
     if (!l.audio || !existsSync(join(dir, l.audio))) throw new Error(`line ${l.id} has no audio file yet: run "toonshorts voice ${dir}"`);
-    const dur = l.duration ?? probeDuration(join(dir, l.audio));
+    let audio = l.audio, wordsRel = wordsPathFor(l.audio);
+    // "pace": shorten long pauses + speed up delivery (exact word remap); needs word timings first
+    if (spec.pace && l.pace !== false && existsSync(join(dir, wordsRel))) {
+      const p = paceLine(dir, l.audio, wordsRel, { ...(typeof spec.pace === "object" ? spec.pace : {}), ...(typeof l.pace === "object" ? l.pace : {}) });
+      audio = p.audio; wordsRel = p.words;
+    }
+    const dur = l.duration ?? probeDuration(join(dir, audio));
     const start = r3(l.start ?? (i === 0 ? t : t + (l.gap ?? spec.gap)));
-    const wp = join(dir, wordsPathFor(l.audio));
+    const wp = join(dir, wordsRel);
     let words = [];
     if (existsSync(wp)) {
       words = JSON.parse(readFileSync(wp, "utf8")).map((w) => ({ text: w.text, start: r3(start + w.start), end: r3(start + w.end) }));
@@ -68,7 +75,7 @@ export function loadModel(dir, { needWords = true } = {}) {
       warnings.push(`line ${l.id}: no word timings (${wordsPathFor(l.audio)}) — run "toonshorts words ${dir}"`);
     }
     t = start + dur;
-    return { id: l.id, text: l.text, audio: l.audio, volume: l.volume ?? 1, start, end: r3(start + dur), dur: r3(dur), words };
+    return { id: l.id, text: l.text, audio, volume: l.volume ?? 1, start, end: r3(start + dur), dur: r3(dur), words };
   });
   const duration = r3(spec.duration ?? t + spec.tail);
 

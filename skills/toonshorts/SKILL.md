@@ -14,8 +14,10 @@ skill's plugin root (two folders up from this file). Run `toonshorts doctor .` o
 
 ## The loop
 
-1. **Story first** (`references/story.md`). Pick a beat formula, write 110-200 words (≈3.7 words/s).
-   Split into voice lines L1..Ln at beat changes. Show the user the script and stop for an OK.
+1. **Story and hook first** (`references/hooks.md`, `references/story.md`). Write the picture hook, the
+   text hook and a spoken hook of 10 words or fewer, then the beats (open loop, turn, proof, re-hook,
+   loop ending). 90-160 words. Split into voice lines L1..Ln at beat changes. Plan one shot per 2-4 s.
+   Show the user the script and stop for an OK.
 2. **Scaffold**: `toonshorts init <dir>`, then write `short.json` (`references/spec.md`): lines,
    scenes anchored to words (`"at": "L3:pushes-0.2"`), `"in"` transition per scene, captions, cues.
 3. **Scenes** (`references/spec.md`, acting rules in `references/motion.md`). A scene is usually 10-25 lines:
@@ -24,8 +26,12 @@ skill's plugin root (two folders up from this file). Run `toonshorts doctor .` o
    - the props that tell this beat, drawn in SVG with 6-10 px ink outlines.
    - a `<script>` with the acting beats, each anchored to a word: `fx.face`, `fx.pose`, `fx.look`,
      `fx.hop`, `fx.pop`, `fx.cam`, `fx.punch`, `fx.kick`. Never a guessed second.
-4. **Preview**: `toonshorts go <dir> --no-render` (voice, word timings, sounds, build, check, one still per
-   scene, audio mix; about 30 s). Read `snaps/preview/sheet.jpg`. Fix framing, overlaps, empty frames.
+4. **Preview**: `toonshorts go <dir> --no-render` (about 30 s). It runs, in order: voice, word timings,
+   **story** (hook, turn, loop ending, shot length, gaps with no new action, pace), sounds, build,
+   **layout** (headless pass over every 0.2 s: moves each scene's captions to a band clear of faces and key
+   art, flags labels on labels, art cut off by the frame or under the platform buttons), HyperFrames check,
+   one still per scene, audio mix. Fix every `FIX` story line and every layout warning, then read
+   `snaps/preview/sheet.jpg` yourself: the machine cannot judge whether a joke lands.
 5. **Render only after the user approves**: `toonshorts go <dir>` (everything above + render + -14 LUFS +
    QA; about 2 minutes for 60 s). QA failures stop the run with the reason.
 6. Give the user `renders/<dir>.mp4` and `SOUND-CREDITS.md` (CC BY sounds must be credited in the description).
@@ -40,8 +46,10 @@ Single steps exist for debugging: `voice words sfx build check preview stills mi
 - Every beat changes something on screen: a face, a pose, a prop, a camera move. Characters are kept
   alive by the engine; you add the acting.
 - Reactions land 0-3 frames **before** the word they answer; sounds peak 1 frame after the picture (engine).
-- Captions: the engine groups by meaning and gives hot words (`captions.hot`) their own punch. Keep the list
-  to 5-8 key words.
+- Captions: the engine groups by meaning, gives hot words (`captions.hot`) their own punch-in, and the layout
+  step picks one caption band per scene that stays clear of faces. Keep the hot list to 4-10 key words.
+- Stable layout: mark labels and numbers in the art `data-key` (any `<text>` counts already). A layout
+  warning is a real defect: move the art, the character or the camera, not the check.
 - Ids are unique across the whole short (prefix with the scene: `s3-bar`). Each scene's camera is `#<sid>-cam`.
 - Deterministic: no `Math.random()` (use `fx.rng(seed)`), no `Date.now()`, no `repeat: -1`.
   A `fromTo` that starts visible needs `immediateRender: false` (the build warns).

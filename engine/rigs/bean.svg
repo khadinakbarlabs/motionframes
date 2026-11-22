@@ -20,7 +20,7 @@
           <circle cx="-34" cy="-110" r="112" fill="none" stroke="none" />
           <path d="M-34 -110 L-36 -30" stroke="{{ink}}" stroke-width="38" fill="none" />
           <path d="M-34 -110 L-36 -30" stroke="{{pants}}" stroke-width="24" fill="none" />
-          <path d="M-74 -2 C-78 -40 -50 -46 -30 -44 C-8 -42 2 -26 2 -2 Z" fill="{{shoe}}" stroke="{{ink}}" stroke-width="7" />
+          <path class="ts-body" d="M-74 -2 C-78 -40 -50 -46 -30 -44 C-8 -42 2 -26 2 -2 Z" fill="{{shoe}}" stroke="{{ink}}" stroke-width="7" />
           <path d="M-64 -24 Q-50 -36 -34 -34" stroke="#ffffff" stroke-width="5" fill="none" opacity="0.35" />
         </g>
       </g>
@@ -32,12 +32,12 @@
           <circle cx="34" cy="-110" r="112" fill="none" stroke="none" />
           <path d="M34 -110 L36 -30" stroke="{{ink}}" stroke-width="38" fill="none" />
           <path d="M34 -110 L36 -30" stroke="{{pants}}" stroke-width="24" fill="none" />
-          <path d="M74 -2 C78 -40 50 -46 30 -44 C8 -42 -2 -26 -2 -2 Z" fill="{{shoe}}" stroke="{{ink}}" stroke-width="7" />
+          <path class="ts-body" d="M74 -2 C78 -40 50 -46 30 -44 C8 -42 -2 -26 -2 -2 Z" fill="{{shoe}}" stroke="{{ink}}" stroke-width="7" />
           <path d="M40 -34 Q56 -36 66 -24" stroke="#ffffff" stroke-width="5" fill="none" opacity="0.35" />
         </g>
       </g>
       <g id="{{id}}-torso">
-        <path d="M-72 -330 C-78 -396 78 -396 74 -330 L80 -232 C84 -168 -84 -168 -80 -232 Z" fill="{{shirt}}" stroke="{{ink}}" stroke-width="8" />
+        <path class="ts-body" d="M-72 -330 C-78 -396 78 -396 74 -330 L80 -232 C84 -168 -84 -168 -80 -232 Z" fill="{{shirt}}" stroke="{{ink}}" stroke-width="8" />
         <path d="M-80 -226 L80 -226 C84 -168 -84 -168 -80 -226 Z" fill="{{pants}}" stroke="{{ink}}" stroke-width="7" />
         <path d="M-12 -214 h24 v14 h-24 Z" fill="{{hot}}" stroke="{{ink}}" stroke-width="4" />
         <path d="M34 -380 C70 -366 76 -300 78 -236 C78 -200 66 -186 40 -182 C58 -236 58 -330 34 -380 Z" fill="{{ink}}" opacity="0.16" />
@@ -79,7 +79,7 @@
           <circle cx="0" cy="-385" r="240" fill="none" stroke="none" />
           <circle cx="-92" cy="-456" r="19" fill="{{skin}}" stroke="{{ink}}" stroke-width="6" />
           <circle cx="92" cy="-456" r="19" fill="{{skin}}" stroke="{{ink}}" stroke-width="6" />
-          <circle cx="0" cy="-462" r="94" fill="{{skin}}" stroke="{{ink}}" stroke-width="8" />
+          <circle class="ts-face" cx="0" cy="-462" r="94" fill="{{skin}}" stroke="{{ink}}" stroke-width="8" />
           <path d="M44 -540 C96 -510 104 -420 58 -380 C82 -430 82 -500 44 -540 Z" fill="{{ink}}" opacity="0.13" />
           <ellipse cx="-58" cy="-424" rx="17" ry="10" fill="#ff7a7a" opacity="0.45" />
           <ellipse cx="60" cy="-424" rx="17" ry="10" fill="#ff7a7a" opacity="0.45" />
@@ -105,7 +105,7 @@
           <path id="{{id}}-mouthE" d="M-28 -414 L32 -414 Q28 -388 2 -388 Q-24 -388 -28 -414 Z" fill="#ffffff" stroke="{{ink}}" stroke-width="6" opacity="0" />
           <path id="{{id}}-mouthF" d="M-20 -404 Q2 -414 24 -404" stroke="{{ink}}" stroke-width="7" fill="none" opacity="0" />
           <g id="{{id}}-hat" data-hat="{{hat}}">
-            <path d="M-100 -500 C-98 -588 -52 -608 0 -608 C52 -608 98 -588 100 -500 Z" fill="{{hat}}" stroke="{{ink}}" stroke-width="8" />
+            <path class="ts-face" d="M-100 -500 C-98 -588 -52 -608 0 -608 C52 -608 98 -588 100 -500 Z" fill="{{hat}}" stroke="{{ink}}" stroke-width="8" />
             <path d="M-16 -604 Q0 -612 16 -604 L16 -504 L-16 -504 Z" fill="#ffffff" opacity="0.3" />
             <path d="M-120 -500 H120" stroke="{{ink}}" stroke-width="20" />
             <path d="M-114 -500 H114" stroke="{{hat}}" stroke-width="8" />

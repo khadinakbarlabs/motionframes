@@ -2,7 +2,9 @@
 // toonshorts: one spec (short.json) + scene files -> a finished vertical short, rendered by HyperFrames.
 //
 //   toonshorts go      <dir> [--draft] [--no-render]   EVERYTHING: voice, words, sounds, build, check, preview, render, QA
-//   toonshorts preview <dir>                          build + one still per scene -> snaps/preview/contact-sheet.jpg
+//   toonshorts story   <dir>                          score the script + shot plan: hook, turn, loop ending, pacing, shots
+//   toonshorts layout  <dir>                          headless check: captions over faces/art (auto-moved), overlaps, cut-offs
+//   toonshorts preview <dir>                          build + one still per scene -> snaps/preview/sheet.jpg
 //   toonshorts init    <dir> [--rig bean|stick]        scaffold short.json + scenes/
 //   toonshorts doctor  .                              check node, ffmpeg, HyperFrames, voice, sound library
 //   toonshorts setup   .                              one-time: install the free local voice (Kokoro)
@@ -15,9 +17,10 @@ import { fileURLToPath } from "node:url";
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { tmpdir, homedir } from "node:os";
 import { loadModel, readSpec, wordsPathFor } from "./lib/spec.mjs";
-import { captionGroups } from "./lib/captions.mjs";
+import { captionGroups, applyLayout } from "./lib/captions.mjs";
 import { planCues, placeCues, resolveSfx, readLock, intentsOf, musicClip, LIBRARY } from "./lib/sfx.mjs";
 import { compose } from "./lib/compose.mjs";
+import { storyReport } from "./lib/story.mjs";
 import { mixPreview, qaVideo, normalize } from "./lib/qa.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -78,6 +81,19 @@ function contactSheet(folder) {
     `xstack=inputs=${cols * rows}:layout=${Array.from({ length: cols * rows }, (_, i) => `${(i % cols) * 324}_${Math.floor(i / cols) * 576}`).join("|")}[o]`;
   execFileSync("ffmpeg", [...args, "-filter_complex", chain, "-map", "[o]", "-frames:v", "1", "-q:v", "3", out]);
   return out;
+}
+
+function findChrome() {
+  if (process.env.TOONSHORTS_CHROME) return process.env.TOONSHORTS_CHROME;
+  const base = join(homedir(), ".cache", "hyperframes", "chrome", "chrome-headless-shell");
+  const found = [];
+  try {
+    for (const v of readdirSync(base)) for (const sub of readdirSync(join(base, v))) {
+      const p = join(base, v, sub, "chrome-headless-shell"); if (existsSync(p)) found.push(p);
+    }
+  } catch {}
+  if (!found.length) throw new Error(`no headless Chrome found in ${base}: run one "toonshorts preview" first (HyperFrames downloads it), or set TOONSHORTS_CHROME`);
+  return found.sort().pop();
 }
 
 const commands = {
@@ -161,7 +177,8 @@ const commands = {
 
   build(dir) {
     const model = loadModel(dir);
-    const captions = captionGroups(model);
+    const lp = join(dir, "layout.json");
+    const captions = applyLayout(captionGroups(model), existsSync(lp) ? JSON.parse(readFileSync(lp, "utf8")) : null);
     const cues = planCues(model, captions);
     const lock = readLock(dir);
     const sfxClips = placeCues(model, cues, lock, 4);
@@ -171,6 +188,41 @@ const commands = {
     if (!existsSync(join(dir, "hyperframes.json"))) writeFileSync(join(dir, "hyperframes.json"), JSON.stringify({ paths: { assets: "assets" } }, null, 2) + "\n");
     const tr = model.scenes.slice(1).map((s) => s.inType);
     return `${model.duration}s, ${model.scenes.length} scenes (${[...new Set(tr)].join("/")}), ${captions.length} captions, ${sfxClips.length} sound clips`;
+  },
+
+  story(dir) {
+    const { checks } = storyReport(dir);
+    for (const c of checks) log(`  ${c.ok ? "ok  " : "FIX "} ${c.name.padEnd(14)} ${c.msg}`);
+    const bad = checks.filter((c) => !c.ok).length;
+    return `${checks.length - bad}/${checks.length} story checks pass${bad ? " (fix the FIX lines before rendering)" : ""}`;
+  },
+
+  // Opens the built short in headless Chrome, steps through it and checks the layout: captions over faces or key
+  // art (moves those captions to a clear band and rebuilds), text on text, things cut off or under the buttons.
+  layout(dir) {
+    commands.build(dir);
+    const chrome = findChrome();
+    const url = "file://" + join(resolve(dir), "index.html").split("/").map(encodeURIComponent).join("/") + "?ts-audit";
+    const r = spawnSync(chrome, ["--headless", "--disable-gpu", "--hide-scrollbars", "--allow-file-access-from-files", "--window-size=1080,1920",
+      "--virtual-time-budget=60000", "--run-all-compositor-stages-before-draw", "--dump-dom", url], { encoding: "utf8", maxBuffer: 1 << 28, timeout: 180000 });
+    const m = (r.stdout || "").match(/<script type="application\/json" id="ts-audit">([\s\S]*?)<\/script>/);
+    if (!m) throw new Error(`layout audit produced no result (is GSAP reachable from the network?): ${explain(r.stderr)}`);
+    const res = JSON.parse(m[1]);
+    const lp = join(dir, "layout.json");
+    const before = existsSync(lp) ? readFileSync(lp, "utf8") : "";
+    const prevHide = before ? (JSON.parse(before).hide || []) : [];
+    const hide = [...prevHide, ...res.hide.filter((h) => !prevHide.some((p) => p.start === h.start && p.text === h.text))];
+    const after = JSON.stringify({ captions: res.captions.map(({ start, text, top }) => ({ start, text, top })), hide }, null, 2) + "\n";
+    const moved = res.captions.filter((c) => c.moved);
+    if (after !== before) { writeFileSync(lp, after); commands.build(dir); }
+    writeFileSync(join(dir, "layout-report.json"), JSON.stringify(res.issues, null, 2) + "\n");
+    const by = {}; for (const i of res.issues) (by[i.kind] = by[i.kind] || []).push(i);
+    for (const [k, list] of Object.entries(by)) if (k !== "duplicate") for (const i of list.slice(0, 6)) log(`  warn  [${k}] ${i.t.toFixed(1)}s  ${i.msg}`);
+    for (const [k, list] of Object.entries(by)) if (list.length > 6) log(`  ...   [${k}] ${list.length - 6} more in layout-report.json`);
+    const cap = (by.caption || []).length;
+    if (cap) throw new Error(`${cap} caption(s) cover a face or key art in every band: move the art or the character, then run again`);
+    const dup = (by.duplicate || []).length, other = res.issues.length - dup;
+    return `${res.samples} frames checked, ${moved.length} caption(s) moved clear of faces/art, ${dup} duplicate caption(s) dropped, ${other} warning(s)`;
   },
 
   check(dir) {
@@ -245,7 +297,7 @@ const commands = {
   },
 
   async go(dir) {
-    const steps = ["voice", "words", "sfx", "build", "check", "preview", "mix"];
+    const steps = ["voice", "words", "story", "sfx", "build", "layout", "check", "preview", "mix"];
     if (!flag("no-render", false)) steps.push("render", "qa");
     log(`toonshorts go ${rel(dir)}`);
     const times = [];
@@ -270,7 +322,7 @@ const commands = {
 };
 
 if (!commands[cmd] || !dirArg) {
-  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 11).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
+  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 13).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
   process.exit(cmd ? 1 : 0);
 }
 try {

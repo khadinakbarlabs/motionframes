@@ -16,12 +16,12 @@
 </g>
 <ellipse id="s3-splash" cx="540" cy="1400" rx="110" ry="22" fill="none" stroke="#ffffff" stroke-width="10" opacity="0" />
 <g id="s3-drops" fill="#ffffff" opacity="0"><circle cx="490" cy="1350" r="12" /><circle cx="540" cy="1320" r="15" /><circle cx="595" cy="1346" r="11" /></g>
-<rig type="bean" id="pip3" x="370" y="1262" scale="1.15" shirt="#2ec4b6" face="neutral" pose="hips" />
+<rig type="bean" id="pip3" x="370" y="1262" scale="1.05" shirt="#2ec4b6" face="neutral" pose="hips" />
 <script>
   fx.look("pip3", 1, at("L2:found") + 0.1);
   fx.face("pip3", "surprised", at("L2:gap") - 0.05);
   fx.pose("pip3", "point", at("L2:gap"));
-  fx.cam("#s3-cam", { scale: 1.18 }, at("L2:gap") - 0.2, 0.9, "500 1150");
+  fx.cam("#s3-cam", { scale: 1.18 }, at("L2:gap") - 0.2, 0.9, "500 700");
   const drop = at("L2:swallow") - 0.25;
   tl.set("#s3-phone", { opacity: 1 }, drop);
   tl.fromTo("#s3-phone", { y: 0, rotation: 0 }, { y: 330, rotation: 70, svgOrigin: "540 1049", duration: 0.45, ease: "power2.in", immediateRender: false }, drop);

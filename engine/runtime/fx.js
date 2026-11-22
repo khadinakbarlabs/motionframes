@@ -268,8 +268,8 @@ function makeFx(tl, opts) {
       }
       if (type === "push") { // zoom through: old frame rushes past camera, new one settles in
         const o = `${W / 2} ${H * 0.5}`;
-        tl.set(inSel, { opacity: 0, scale: 0.84, svgOrigin: o }, a)
-          .set(outSel, { svgOrigin: o }, a)
+        tl.set(inSel, { opacity: 0, scale: 0.84, x: 0, y: 0, svgOrigin: o, smoothOrigin: false }, a)
+          .set(outSel, { svgOrigin: o, smoothOrigin: false }, a)
           .to(outSel, { scale: 1.8, opacity: 0, duration: dur, ease: "power2.in" }, a)
           .to(inSel, { scale: 1, opacity: 1, duration: dur * 1.2, ease: "power3.out" }, a + dur * 0.35)
           .set(outSel, { scale: 1 }, end + dur);

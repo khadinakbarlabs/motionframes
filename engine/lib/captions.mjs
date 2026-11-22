@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 // Punch captions: 1-2 word groups cut on the voice's own word timings.
 // short.json "captions": { "words": 2, "hot": ["gaps","bump"], "replace": {"five centimetres":"+5 CM"},
 //                          "position": "high" (default, y=330) | "low" (y=1080) | <top px>, "case": "upper"|"lower", "off": false,
@@ -72,24 +74,51 @@ export function captionGroups(model) {
     }
   }
   groups.sort((a, b) => a.start - b.start);
+  // a caption never rides into the next shot: it ends where the transition into the next scene begins
+  const cuts = model.scenes.slice(1).map((s) => s.start - 0.18);
   groups.forEach((g, i) => {
-    const next = groups[i + 1]?.start ?? model.duration;
+    const cut = cuts.find((c) => c > g.start + 0.25);
+    const next = Math.min(groups[i + 1]?.start ?? model.duration, cut ?? Infinity);
     const want = g.lastEnd ? Math.max(g.lastEnd + 0.15, g.start + 0.45) : g.start + maxDur;
     g.end = Math.min(next - 0.04, g.start + maxDur, want);
     g.start = Math.round(g.start * 1000) / 1000;
     g.dur = Math.max(0.2, Math.round((g.end - g.start) * 1000) / 1000);
   });
-  return groups.filter((g) => g.text);
+  const hookEnd = model.spec.hook && model.spec.hook.text ? model.at(model.spec.hook.until || "L1.end") + 0.15 : 0;
+  return groups.filter((g) => g.text && g.start >= hookEnd - 0.05 && !(layoutHide(model).has(`${g.start}|${g.text}`)));
+}
+
+// captions the layout step found already written in the art at that moment (no double "+5 CM")
+function layoutHide(model) {
+  try { const j = JSON.parse(readFileSync(join(model.dir, "layout.json"), "utf8")); return new Set((j.hide || []).map((h) => `${h.start}|${h.text}`)); }
+  catch { return new Set(); }
+}
+
+// caption bands the layout step may move a caption to when it would cover a face or key art
+export function captionBands(spec) {
+  const c = spec.captions || {};
+  const high = c.position === "low" ? 1080 : typeof c.position === "number" ? c.position : 330;
+  return [...new Set([high, 600, 1010, 330])];  // all inside the TikTok/Reels/Shorts safe area (y 288-1248)
+}
+
+// apply caption tops chosen by "toonshorts layout" (layout.json), matched by start time + text
+export function applyLayout(groups, layout) {
+  if (!layout || !Array.isArray(layout.captions)) return groups;
+  const m = new Map(layout.captions.map((c) => [`${c.start}|${c.text}`, c.top]));
+  return groups.map((g) => (m.has(`${g.start}|${g.text}`) ? { ...g, top: m.get(`${g.start}|${g.text}`) } : g));
 }
 
 export function captionCss(spec) {
   const c = spec.captions || {};
   const top = c.position === "low" ? 1080 : typeof c.position === "number" ? c.position : 330;
   return `
-      .cap { position: absolute; left: 0; right: 0; top: ${top}px; padding: 0 200px 0 110px; display: flex; justify-content: center; text-align: center; }
+      .cap { position: absolute; left: 0; right: 0; top: ${top}px; padding: 0 200px 0 125px; display: flex; justify-content: center; text-align: center; }
       .cap span { display: inline-block; font-family: var(--font-caption); font-size: ${c.size ?? 92}px; line-height: 1.0; color: #fff;
         letter-spacing: 0.01em; -webkit-text-stroke: 14px var(--ink); paint-order: stroke fill;
         filter: drop-shadow(0 9px 0 rgba(15, 18, 32, 0.55)); }
+      .cap.hook span { font-size: ${Math.round((c.size ?? 92) * 1.15)}px; line-height: 1.02; max-width: 760px; }
+      .cap.hook .hot { font-size: inherit; }
+      .cap.low { padding: 0 305px 0 125px; }   /* below y 840 TikTok's buttons start at x 780 */
       .cap .hot { color: var(--hot); font-size: ${Math.round((c.size ?? 92) * 1.12)}px; }`;
 }
 
@@ -97,7 +126,7 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 export function captionMarkup(groups) {
   const html = groups.map((g, i) =>
-    `      <div id="cap${i + 1}" class="clip cap" data-start="${g.start}" data-duration="${g.dur}" data-track-index="1" data-track-kind="captions"><span${g.hot ? ' class="hot"' : ""}>${esc(g.text)}</span></div>`
+    `      <div id="cap${i + 1}" class="clip cap${g.top > 840 ? " low" : ""}"${g.top !== undefined ? ` style="top: ${g.top}px"` : ""} data-start="${g.start}" data-duration="${g.dur}" data-track-index="1" data-track-kind="captions"><span${g.hot ? ' class="hot"' : ""}>${esc(g.text)}</span></div>`
   ).join("\n");
   let h = 0;
   const js = groups.map((g, i) => {

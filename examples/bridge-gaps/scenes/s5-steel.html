@@ -33,7 +33,7 @@
   <rect x="395" y="672" width="440" height="96" rx="48" fill="#0f1220" />
   <text x="615" y="736" text-anchor="middle" font-family="Archivo Black" font-size="46" fill="#ffc93c">+1 MM / 8°C</text>
 </g>
-<g id="s5-seasons">
+<g id="s5-seasons" transform="translate(-80 0)">
   <g id="s5-winter" opacity="0">
     <rect x="390" y="672" width="196" height="96" rx="20" fill="#8fc7ff" stroke="#0f1220" stroke-width="6" />
     <text x="488" y="734" text-anchor="middle" font-family="Archivo Black" font-size="36" fill="#0f1220">WINTER</text>
@@ -55,9 +55,15 @@
   </g>
   <path id="s5-miniarr" d="M880 1410 h60 m-24 -24 l24 24 l-24 24" stroke="#ff5a4a" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
 </g>
-<rig type="bean" id="pip5" x="170" y="1640" scale="0.62" shirt="#2ec4b6" face="thinking" prop="none" />
+<rig type="bean" id="pip5" x="235" y="1640" scale="0.62" shirt="#2ec4b6" face="thinking" prop="none" />
 <script>
   fx.pop("#s5-sunwrap", S.start + 0.25);
+  fx.look("pip5", 1, at("L3:steel") - 0.05);
+  fx.pose("pip5", "present", at("L3:grows"));
+  fx.face("pip5", "surprised", at("L3:hot") - 0.05);
+  fx.punch("#s5-cam", at("L3:10"), { amt: 0.06, origin: "690 1100" });
+  fx.nod("pip5", at("L3:degrees"), 2);
+  fx.face("pip5", "thinking", at("L3:degrees"));
   tl.to("#s5-rays", { rotation: 30, svgOrigin: "230 720", duration: S.end - S.start, ease: "none" }, S.start);
   tl.fromTo("#s5-merc", { scaleY: 0.25, svgOrigin: "892 840" }, { scaleY: 1, duration: 1.2, ease: "power2.inOut" }, at("L3:hot") - 0.3);
   tl.to("#s5-glow", { opacity: 0.45, duration: 1.0, ease: "power1.inOut" }, at("L3:hot") - 0.2);
